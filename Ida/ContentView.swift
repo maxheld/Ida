@@ -59,6 +59,8 @@ struct CountersListView: View {
         AddItemView(item: itemDraft)
           .navigationTitle("New Item")
       }
+      .presentationDetents([.medium, .large])
+      .presentationDragIndicator(.visible)
     }
     .navigationTitle("Items")
     .toolbar {
