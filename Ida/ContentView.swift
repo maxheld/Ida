@@ -78,6 +78,7 @@ struct CountersListView: View {
         } label: {
           Image(systemName: "plus")
         }
+        .buttonStyle(.glassProminent)
       }
     }
   }
@@ -122,7 +123,6 @@ struct ItemRow: View {
         .foregroundColor(.primary)
         .font(.default)
     }
-    .padding()
   }
 }
 
@@ -151,14 +151,19 @@ struct AddItemView: View {
     }
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
-      ToolbarItem {
-        Button(action: saveButtonTapped) {
-          Text("Save")
+      ToolbarItem(placement: .primaryAction) {
+        Button {
+          saveButtonTapped()
+        } label: {
+          Image(systemName: "checkmark")
         }
+        .buttonStyle(.glassProminent)
       }
       ToolbarItem(placement: .cancellationAction) {
-        Button("Cancel") {
+        Button {
           dismiss()
+        } label: {
+          Image(systemName: "xmark")
         }
       }
     }
