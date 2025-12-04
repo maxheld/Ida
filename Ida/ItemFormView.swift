@@ -4,10 +4,10 @@ import SwiftUI
 import SwiftUINavigation
 
 struct ItemFormView: View {
-  @State var item: Item.Draft
-  
   @Dependency(\.defaultDatabase) private var database
-  @Environment(\.dismiss) var dismiss
+  @Environment(\.dismiss) private var dismiss
+
+  @State var item: Item.Draft
   
   var body: some View {
     Form {
