@@ -45,8 +45,12 @@ struct CountersListView: View {
 //        }
         Section {
           ForEach(items) { item in
-            ItemRow(item: item)
-              .buttonStyle(.borderless)
+            Button {
+              destination = .itemForm(.init(item))
+            } label: {
+              ItemRow(item: item)
+                .buttonStyle(.borderless)
+            }
           }
           .onDelete { indexSet in
             deleteRows(at: indexSet)
