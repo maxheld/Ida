@@ -8,10 +8,10 @@ import SQLiteData
 //  var count = 0
 //}
 
-@Selection
+//@Selection
 struct ItemsGroupedByDay {
-  let item: Item
-  let count: Int
+  let day: Date
+  let items: [Item]
 }
 
 @Table

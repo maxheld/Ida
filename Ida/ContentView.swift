@@ -30,32 +30,36 @@ struct CountersListView: View {
   var body: some View {
     List {
       if !items.isEmpty {
-//        ForEach(groupedItems, id: \.key) { group in
-//          Section(
-//            header: Text("\(group.key)")
-//          ) {
-//            ForEach(group.value) { item in
-//              ItemRow() // ADD ITEM HERE
-//                .buttonStyle(.borderless)
-//            }
-//            .onDelete { indexSet in
-//              deleteRows(at: indexSet)
-//            }
-//          }
-//        }
-        Section {
-          ForEach(items) { item in
-            Button {
-              destination = .itemForm(.init(item))
-            } label: {
-              ItemRow(item: item)
-                .buttonStyle(.borderless)
+        ForEach(groupedItems, id: \.key) { group in
+          Section(
+            header: Text("\(group.key.customFormatted())")
+          ) {
+            ForEach(group.value) { item in
+              Button {
+                destination = .itemForm(.init(item))
+              } label: {
+                ItemRow(item: item)
+                  .buttonStyle(.borderless)
+              }
+            }
+            .onDelete { indexSet in
+              deleteRows(groupDay: group.key, at: indexSet)
             }
           }
-          .onDelete { indexSet in
-            deleteRows(at: indexSet)
-          }
         }
+//        Section {
+//          ForEach(items) { item in
+//            Button {
+//              destination = .itemForm(.init(item))
+//            } label: {
+//              ItemRow(item: item)
+//                .buttonStyle(.borderless)
+//            }
+//          }
+//          .onDelete { indexSet in
+//            deleteRows(at: indexSet)
+//          }
+//        }
       }
     }
     .sheet(item: $destination.itemForm, id: \.id) { itemDraft in
@@ -89,11 +93,17 @@ struct CountersListView: View {
     }
   }
 
-  func deleteRows(at indexSet: IndexSet) {
+  func deleteRows(groupDay: Date, at indexSet: IndexSet) {
     withErrorReporting {
       try database.write { db in
         for index in indexSet {
-          try Item.find(items[index].id).delete()
+          guard
+            let group = groupedItems.first(where: { $0.key == groupDay })
+          else { continue }
+          
+          try Item
+            .find(group.value[index].id)
+            .delete()
             .execute(db)
         }
       }
@@ -113,13 +123,13 @@ struct CountersListView: View {
   }
 }
 
-
-
-
-
 extension Date {
   func startOfDay() -> Date {
     Calendar.current.startOfDay(for: self)
+  }
+  
+  func customFormatted() -> String {
+    self.formatted(date: .complete, time: .omitted)
   }
 }
 
