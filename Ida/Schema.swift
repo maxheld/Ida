@@ -17,10 +17,16 @@ struct ItemsGroupedByDay {
 @Table
 nonisolated struct Item: Identifiable {
   let id: UUID
+  let childID: Child.ID
   var date: Date = .init()
   var description: String = ""
 }
 
+@Table
+nonisolated struct Child: Identifiable {
+  let id: UUID
+  var name: String = ""
+}
 
 extension DependencyValues {
   mutating func bootstrapDatabase() throws {
@@ -39,8 +45,19 @@ extension DependencyValues {
     migrator.registerMigration("Create tables") { db in
       try #sql(
         """
+        CREATE TABLE "childs" (
+          "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
+          "name" TEXT NOT NULL DEFAULT ''
+        ) STRICT
+        """
+      )
+      .execute(db)
+      
+      try #sql(
+        """
         CREATE TABLE "items" (
           "id" TEXT PRIMARY KEY NOT NULL ON CONFLICT REPLACE DEFAULT (uuid()),
+          "childID" TEXT NOT NULL REFERENCES "childs"("id") ON DELETE CASCADE,  
           "date" TEXT NOT NULL ON CONFLICT REPLACE DEFAULT CURRENT_TIMESTAMP,
           "description" TEXT NOT NULL ON CONFLICT REPLACE DEFAULT ''
         ) STRICT
@@ -52,7 +69,7 @@ extension DependencyValues {
     defaultDatabase = database
     defaultSyncEngine = try SyncEngine(
       for: defaultDatabase,
-      tables: Item.self
+      tables: Child.self, Item.self
     )
   }
 }

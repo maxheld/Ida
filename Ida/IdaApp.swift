@@ -18,7 +18,7 @@ struct IdaApp: App {
   var body: some Scene {
     WindowGroup {
       NavigationStack {
-        CountersListView()
+        ChildListView()
       }
     }
   }
