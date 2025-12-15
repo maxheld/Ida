@@ -23,7 +23,7 @@ nonisolated struct Item: Identifiable {
 }
 
 @Table
-nonisolated struct Child: Identifiable {
+nonisolated struct Child: Identifiable, Hashable {
   let id: UUID
   var name: String = ""
 }
