@@ -9,6 +9,8 @@ struct ItemFormView: View {
 
   @State var item: Item.Draft
   
+  @FetchAll(Item.none) var suggestions: [Item]
+  
   var body: some View {
     Form {
       Section {
@@ -22,8 +24,22 @@ struct ItemFormView: View {
       
       Section {
         TextField("Description", text: $item.description)
-          .textFieldStyle(.plain)
           .padding()
+        
+        if !suggestions.isEmpty {
+          FlowLayout {
+            ForEach(suggestions) { suggestion in
+              Button(suggestion.description) {
+                if item.description != "" {
+                  item.description.append(" \(suggestion.description)")
+                } else {
+                  item.description = suggestion.description
+                }
+              }
+            }
+            .buttonStyle(.bordered)
+          }
+        }
       }
     }
     .navigationBarTitleDisplayMode(.inline)
@@ -35,6 +51,7 @@ struct ItemFormView: View {
           Image(systemName: "checkmark")
         }
         .buttonStyle(.glassProminent)
+        .disabled(item.description == "")
       }
       ToolbarItem(placement: .cancellationAction) {
         Button {
@@ -44,6 +61,7 @@ struct ItemFormView: View {
         }
       }
     }
+    .task { await task() }
   }
   
   private func saveButtonTapped() {
@@ -53,5 +71,88 @@ struct ItemFormView: View {
       }
     }
     dismiss()
+  }
+  
+  private func task() async {
+    await withErrorReporting {
+      try await $suggestions.load(
+        Item
+          .where { $0.childID.eq(item.childID) }
+          .order { $0.date.desc() },
+//        animation: .default
+      )
+    }
+  }
+}
+
+private struct FlowLayout: Layout {
+  var spacing: CGFloat = 4
+  var rowSpacing: CGFloat = 4
+  var alignment: HorizontalAlignment = .leading
+  
+  func sizeThatFits(
+    proposal: ProposedViewSize,
+    subviews: Subviews,
+    cache: inout ()
+  ) -> CGSize {
+    let maxWidth = proposal.width ?? .infinity
+    var x: CGFloat = 0
+    var y: CGFloat = 0
+    var rowHeight: CGFloat = 0
+    
+    for subview in subviews {
+      let size = subview.sizeThatFits(.unspecified)
+      
+      if x + size.width > maxWidth {
+        // wrap to next line
+        x = 0
+        y += rowHeight + rowSpacing
+        rowHeight = 0
+      }
+      
+      rowHeight = max(rowHeight, size.height)
+      x += size.width + spacing
+    }
+    
+    return CGSize(
+      width: maxWidth,
+      height: y + rowHeight
+    )
+  }
+  
+  func placeSubviews(
+    in bounds: CGRect,
+    proposal: ProposedViewSize,
+    subviews: Subviews,
+    cache: inout ()
+  ) {
+    let maxWidth = bounds.width
+    var x: CGFloat = 0
+    var y: CGFloat = 0
+    var rowHeight: CGFloat = 0
+    
+    for subview in subviews {
+      let size = subview.sizeThatFits(.unspecified)
+      
+      if x + size.width > maxWidth {
+        // wrap to next line
+        x = 0
+        y += rowHeight + rowSpacing
+        rowHeight = 0
+      }
+      
+      let origin = CGPoint(
+        x: bounds.minX + x,
+        y: bounds.minY + y
+      )
+      
+      subview.place(
+        at: origin,
+        proposal: ProposedViewSize(width: size.width, height: size.height)
+      )
+      
+      rowHeight = max(rowHeight, size.height)
+      x += size.width + spacing
+    }
   }
 }
