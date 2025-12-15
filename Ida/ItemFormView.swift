@@ -27,6 +27,45 @@ struct ItemFormView: View {
           displayedComponents: [.date, .hourAndMinute]
         )
         .labelsHidden()
+        
+        HStack(alignment: .center) {
+          Button {
+            item.date.addTimeInterval(-10 * 60)
+          } label: {
+            Image(systemName: "10.arrow.trianglehead.clockwise")
+          }
+          Spacer()
+          Button {
+            item.date.addTimeInterval(-5 * 60)
+          } label: {
+            Image(systemName: "5.arrow.trianglehead.clockwise")
+          }
+          Spacer()
+          Button {
+            item.date.addTimeInterval(-1 * 60)
+          } label: {
+            Image(systemName: "minus.arrow.trianglehead.clockwise")
+          }
+          Spacer()
+          Button {
+            item.date.addTimeInterval(1 * 60)
+          } label: {
+            Image(systemName: "plus.arrow.trianglehead.counterclockwise")
+          }
+          Spacer()
+          Button {
+            item.date.addTimeInterval(5 * 60)
+          } label: {
+            Image(systemName: "5.arrow.trianglehead.counterclockwise")
+          }
+          Spacer()
+          Button {
+            item.date.addTimeInterval(10 * 60)
+          } label: {
+            Image(systemName: "10.arrow.trianglehead.counterclockwise")
+          }
+        }
+        .buttonStyle(.bordered)
       }
       
       Section {
