@@ -70,7 +70,6 @@ struct ChildListView: View {
 
 
 struct ChildDetailView: View {
-  
   @CasePathable
   enum Destination {
     case itemForm(Item.Draft)
@@ -78,8 +77,6 @@ struct ChildDetailView: View {
   
   @FetchAll(
     Item.none,
-//      .where { $0.child.eq(child.id) }
-//      .order { $0.date.desc() },
     animation: .default
   ) var items: [Item]
   
@@ -179,6 +176,7 @@ struct ChildDetailView: View {
 //      }
 //    }
   }
+
   private func task() async {
     await withErrorReporting {
       try await $items.load(
