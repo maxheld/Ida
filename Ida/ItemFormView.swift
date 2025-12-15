@@ -3,13 +3,20 @@ import SQLiteData
 import SwiftUI
 import SwiftUINavigation
 
+@Selection
+struct Suggestion: Identifiable {
+  let description: String
+  
+  var id: String { description }
+}
+
 struct ItemFormView: View {
   @Dependency(\.defaultDatabase) private var database
   @Environment(\.dismiss) private var dismiss
 
   @State var item: Item.Draft
   
-  @FetchAll(Item.none) var suggestions: [Item]
+  @FetchAll(Suggestion.none) var suggestions: [Suggestion]
   
   var body: some View {
     Form {
@@ -78,8 +85,9 @@ struct ItemFormView: View {
       try await $suggestions.load(
         Item
           .where { $0.childID.eq(item.childID) }
-          .order { $0.date.desc() },
-//        animation: .default
+          .order { $0.date.desc() }
+          .distinct()
+          .select { Suggestion.Columns(description: $0.description) }
       )
     }
   }

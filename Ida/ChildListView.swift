@@ -36,7 +36,6 @@ struct ChildListView: View {
         } label: {
           Image(systemName: "plus")
         }
-        .buttonStyle(.glass)
         .alert("New child", isPresented: $isNewChildAlertPresented) {
           TextField("Child name", text: $newChildName)
           Button("Save") {
