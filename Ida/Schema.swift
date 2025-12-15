@@ -2,18 +2,6 @@ import Foundation
 import OSLog
 import SQLiteData
 
-//@Table
-//nonisolated struct Counter: Identifiable {
-//  let id: UUID
-//  var count = 0
-//}
-
-//@Selection
-struct ItemsGroupedByDay {
-  let day: Date
-  let items: [Item]
-}
-
 @Table
 nonisolated struct Item: Identifiable {
   let id: UUID

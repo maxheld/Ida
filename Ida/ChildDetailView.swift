@@ -63,7 +63,7 @@ struct ChildDetailView: View {
     .toolbar {
       ToolbarItem(placement: .primaryAction) {
         Button {
-          print("Share tapped")
+          shareButtonTapped()
         } label: {
           Image(systemName: "square.and.arrow.up")
         }
@@ -104,11 +104,11 @@ struct ChildDetailView: View {
   }
   
   func shareButtonTapped() {
-//    Task {
-//      sharedRecord = try await syncEngine.share(record: items) { share in
-//        share[CKShare.SystemFieldKey.title] = "Join my counter!"
-//      }
-//    }
+    Task {
+      sharedRecord = try await syncEngine.share(record: child) { share in
+        share[CKShare.SystemFieldKey.title] = "Join me in logging daily activities of our child \(child.name)"
+      }
+    }
   }
 
   private func task() async {
