@@ -25,13 +25,13 @@ struct ChildListView: View {
         }
       } else {
         ContentUnavailableView(
-          "Add your first child!",
+          .childListEmptyTitle,
           systemImage: "figure.2.and.child.holdinghands",
-          description: Text("Press the + button to start tracking daily items for your child.")
+          description: Text(.childListEmptyDescription)
         )
       }
     }
-    .navigationTitle("Children")
+    .navigationTitle(.childListTitle)
     .toolbar {
       ToolbarItemGroup(placement: .bottomBar) {
         Spacer()
@@ -42,9 +42,12 @@ struct ChildListView: View {
         } label: {
           Image(systemName: "plus")
         }
-        .alert("New child", isPresented: $isNewChildAlertPresented) {
-          TextField("Child name", text: $newChildName)
-          Button("Save") {
+        .alert(
+          .childListNewChildTitle,
+          isPresented: $isNewChildAlertPresented
+        ) {
+          TextField(.childListNewChildNameLabel, text: $newChildName)
+          Button(.save) {
             withErrorReporting {
               try database.write { db in
                 try Child
@@ -53,7 +56,7 @@ struct ChildListView: View {
               }
             }
           }
-          Button("Cancel", role: .cancel) { }
+          Button(.cancel, role: .cancel) { }
         }
       }
     }

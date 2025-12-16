@@ -33,7 +33,7 @@ struct ChildDetailView: View {
       if !items.isEmpty {
         ForEach(groupedItems, id: \.key) { group in
           Section(
-            header: Text("\(group.key.customFormatted())")
+            header: Text(group.key.customFormatted())
           ) {
             ForEach(group.value) { item in
               Button {
@@ -50,9 +50,9 @@ struct ChildDetailView: View {
         }
       } else {
         ContentUnavailableView(
-          "No entries for \(child.name)",
+          .childDetailEmptyTitle(child.name),
           systemImage: "figure.2.and.child.holdinghands",
-          description: Text("Press the + button to add a new entry.")
+          description: Text(.childDetailEmptyDescription)
         )
       }
     }
@@ -107,7 +107,7 @@ struct ChildDetailView: View {
   func shareButtonTapped() {
     Task {
       sharedRecord = try await syncEngine.share(record: child) { share in
-        share[CKShare.SystemFieldKey.title] = "Join me in logging daily activities of our child \(child.name)"
+        share[CKShare.SystemFieldKey.title] = String(localized: "child.detail.share.title \(child.name)")
       }
     }
   }
@@ -130,7 +130,7 @@ private struct ItemFormSheet: View {
   var body: some View {
     NavigationStack {
       ItemFormView(item: itemDraft)
-        .navigationTitle("New Item")
+        .navigationTitle(.itemFormTitle)
     }
     .presentationDetents([.medium, .large])
     .presentationDragIndicator(.visible)

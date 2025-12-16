@@ -22,7 +22,7 @@ struct ItemFormView: View {
     Form {
       Section {
         DatePicker(
-          "Select time",
+          .itemFormDatepickerLabel,
           selection: $item.date,
           displayedComponents: [.date, .hourAndMinute]
         )
@@ -32,7 +32,7 @@ struct ItemFormView: View {
       }
       
       Section {
-        TextField("Description", text: $item.description)
+        TextField(.itemFormTextfieldLabel, text: $item.description)
           .padding()
         
         if !suggestions.isEmpty {
