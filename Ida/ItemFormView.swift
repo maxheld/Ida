@@ -28,44 +28,7 @@ struct ItemFormView: View {
         )
         .labelsHidden()
         
-        HStack(alignment: .center) {
-          Button {
-            item.date.addTimeInterval(-10 * 60)
-          } label: {
-            Image(systemName: "10.arrow.trianglehead.clockwise")
-          }
-          Spacer()
-          Button {
-            item.date.addTimeInterval(-5 * 60)
-          } label: {
-            Image(systemName: "5.arrow.trianglehead.clockwise")
-          }
-          Spacer()
-          Button {
-            item.date.addTimeInterval(-1 * 60)
-          } label: {
-            Image(systemName: "minus.arrow.trianglehead.clockwise")
-          }
-          Spacer()
-          Button {
-            item.date.addTimeInterval(1 * 60)
-          } label: {
-            Image(systemName: "plus.arrow.trianglehead.counterclockwise")
-          }
-          Spacer()
-          Button {
-            item.date.addTimeInterval(5 * 60)
-          } label: {
-            Image(systemName: "5.arrow.trianglehead.counterclockwise")
-          }
-          Spacer()
-          Button {
-            item.date.addTimeInterval(10 * 60)
-          } label: {
-            Image(systemName: "10.arrow.trianglehead.counterclockwise")
-          }
-        }
-        .buttonStyle(.bordered)
+        TimeShortcuts(date: $item.date)
       }
       
       Section {
@@ -131,6 +94,52 @@ struct ItemFormView: View {
     }
   }
 }
+
+private struct TimeShortcuts: View {
+  @Binding var date: Date
+  
+  var body: some View {
+    HStack(alignment: .center) {
+      Button {
+        date.addTimeInterval(-10 * 60)
+      } label: {
+        Image(systemName: "10.arrow.trianglehead.clockwise")
+      }
+      Spacer()
+      Button {
+        date.addTimeInterval(-5 * 60)
+      } label: {
+        Image(systemName: "5.arrow.trianglehead.clockwise")
+      }
+      Spacer()
+      Button {
+        date.addTimeInterval(-1 * 60)
+      } label: {
+        Image(systemName: "minus.arrow.trianglehead.clockwise")
+      }
+      Spacer()
+      Button {
+        date.addTimeInterval(1 * 60)
+      } label: {
+        Image(systemName: "plus.arrow.trianglehead.counterclockwise")
+      }
+      Spacer()
+      Button {
+        date.addTimeInterval(5 * 60)
+      } label: {
+        Image(systemName: "5.arrow.trianglehead.counterclockwise")
+      }
+      Spacer()
+      Button {
+        date.addTimeInterval(10 * 60)
+      } label: {
+        Image(systemName: "10.arrow.trianglehead.counterclockwise")
+      }
+    }
+    .buttonStyle(.bordered)
+  }
+}
+
 
 private struct FlowLayout: Layout {
   var spacing: CGFloat = 4
