@@ -17,7 +17,7 @@ nonisolated struct Child: Identifiable, Hashable {
 }
 
 extension DependencyValues {
-  mutating func bootstrapDatabase() throws {
+  mutating func bootstrapDatabase(seedData: Bool = false) throws {
     let database = try SQLiteData.defaultDatabase()
     logger.debug(
       """
@@ -30,7 +30,7 @@ extension DependencyValues {
     #if DEBUG
       migrator.eraseDatabaseOnSchemaChange = true
     #endif
-    migrator.registerMigration("Create tables") { db in
+    migrator.registerMigration("Create tables") { [seedData] db in
       try #sql(
         """
         CREATE TABLE "childs" (
@@ -52,6 +52,11 @@ extension DependencyValues {
         """
       )
       .execute(db)
+      
+      @Dependency(\.context) var context
+      if context != .live && seedData {
+        try db.seedSampleData()
+      }
     }
     try migrator.migrate(database)
     defaultDatabase = database
@@ -64,3 +69,21 @@ extension DependencyValues {
 
 private let logger = Logger(subsystem: "Ida", category: "Database")
 
+#if DEBUG
+  extension Database {
+    nonisolated func seedSampleData() throws {
+      @Dependency(\.date.now) var now
+      @Dependency(\.uuid) var uuid
+      try seed {
+        Child(id: UUID(1), name: "Ida")
+        Child(id: UUID(2), name: "Max")
+        Item.Draft(
+          id: uuid(),
+          childID: UUID(1),
+          date: now.addingTimeInterval(-60 * 60 * 24 * 190),
+          description: "🥑💦"
+        )
+      }
+    }
+  }
+#endif

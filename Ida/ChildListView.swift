@@ -72,3 +72,12 @@ struct ChildListView: View {
     }
   }
 }
+
+#Preview {
+  let _ = try! prepareDependencies {
+    try $0.bootstrapDatabase(seedData: true)
+  }
+  NavigationStack {
+    ChildListView()
+  }
+}
