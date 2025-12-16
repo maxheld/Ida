@@ -23,6 +23,12 @@ struct ChildListView: View {
         .onDelete { indexSet in
           deleteRows(at: indexSet)
         }
+      } else {
+        ContentUnavailableView(
+          "Add your first child!",
+          systemImage: "figure.2.and.child.holdinghands",
+          description: Text("Press the + button to start tracking daily items for your child.")
+        )
       }
     }
     .navigationTitle("Children")

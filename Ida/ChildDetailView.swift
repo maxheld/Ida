@@ -48,16 +48,17 @@ struct ChildDetailView: View {
             }
           }
         }
+      } else {
+        ContentUnavailableView(
+          "No entries for \(child.name)",
+          systemImage: "figure.2.and.child.holdinghands",
+          description: Text("Press the + button to add a new entry.")
+        )
       }
     }
     .task { await task() }
     .sheet(item: $destination.itemForm, id: \.id) { itemDraft in
-      NavigationStack {
-        ItemFormView(item: itemDraft)
-          .navigationTitle("New Item")
-      }
-      .presentationDetents([.medium, .large])
-      .presentationDragIndicator(.visible)
+      ItemFormSheet(itemDraft: itemDraft)
     }
     .navigationTitle(child.name)
     .toolbar {
@@ -120,6 +121,19 @@ struct ChildDetailView: View {
         animation: .default
       )
     }
+  }
+}
+
+private struct ItemFormSheet: View {
+  var itemDraft: Item.Draft
+  
+  var body: some View {
+    NavigationStack {
+      ItemFormView(item: itemDraft)
+        .navigationTitle("New Item")
+    }
+    .presentationDetents([.medium, .large])
+    .presentationDragIndicator(.visible)
   }
 }
 
