@@ -52,11 +52,12 @@ extension DependencyValues {
         """
       )
       .execute(db)
-      
-      @Dependency(\.context) var context
-      if context != .live && seedData {
-        try db.seedSampleData()
-      }
+      #if DEBUG
+        @Dependency(\.context) var context
+        if context != .live && seedData {
+          try db.seedSampleData()
+        }
+      #endif
     }
     try migrator.migrate(database)
     defaultDatabase = database
