@@ -31,7 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0F49BBF92ECDFB420035ACDF /* Ida.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ida.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0F49BBF92ECDFB420035ACDF /* Ida - Baby Activity Logger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ida - Baby Activity Logger.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F49BC062ECDFB430035ACDF /* IdaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F49BC102ECDFB430035ACDF /* IdaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -109,7 +109,7 @@
 		0F49BBFA2ECDFB420035ACDF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0F49BBF92ECDFB420035ACDF /* Ida.app */,
+				0F49BBF92ECDFB420035ACDF /* Ida - Baby Activity Logger.app */,
 				0F49BC062ECDFB430035ACDF /* IdaTests.xctest */,
 				0F49BC102ECDFB430035ACDF /* IdaUITests.xctest */,
 			);
@@ -141,7 +141,7 @@
 				0F9862CD2ED4FB6F00E5B45C /* SwiftUINavigationCore */,
 			);
 			productName = Ida;
-			productReference = 0F49BBF92ECDFB420035ACDF /* Ida.app */;
+			productReference = 0F49BBF92ECDFB420035ACDF /* Ida - Baby Activity Logger.app */;
 			productType = "com.apple.product-type.application";
 		};
 		0F49BC052ECDFB430035ACDF /* IdaTests */ = {
@@ -428,13 +428,14 @@
 				CODE_SIGN_ENTITLEMENTS = Ida/Ida.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N8BZ833L9R;
+				DEVELOPMENT_TEAM = 484NRR8XRN;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Ida/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Ida - Baby Activity Logger";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -452,7 +453,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.maxheld.Ida;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Ida - Baby Activity Logger";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -476,13 +477,14 @@
 				CODE_SIGN_ENTITLEMENTS = Ida/Ida.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N8BZ833L9R;
+				DEVELOPMENT_TEAM = 484NRR8XRN;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Ida/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Ida - Baby Activity Logger";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -500,7 +502,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.maxheld.Ida;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Ida - Baby Activity Logger";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
