@@ -63,7 +63,8 @@ extension DependencyValues {
     defaultDatabase = database
     defaultSyncEngine = try SyncEngine(
       for: defaultDatabase,
-      tables: Child.self, Item.self
+      tables: Child.self, Item.self,
+      containerIdentifier: "iCloud.com.maxheld.IdaApp"
     )
   }
 }
