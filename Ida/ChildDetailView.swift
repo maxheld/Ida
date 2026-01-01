@@ -108,6 +108,7 @@ struct ChildDetailView: View {
     Task {
       sharedRecord = try await syncEngine.share(record: child) { share in
         share[CKShare.SystemFieldKey.title] = String(localized: "child.detail.share.title \(child.name)")
+        share.publicPermission = .readWrite
       }
     }
   }

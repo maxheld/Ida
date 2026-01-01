@@ -10,11 +10,16 @@ struct Suggestion: Identifiable {
   var id: String { description }
 }
 
+enum Field: Hashable {
+  case description
+}
+
 struct ItemFormView: View {
   @Dependency(\.defaultDatabase) private var database
   @Environment(\.dismiss) private var dismiss
 
   @State var item: Item.Draft
+  @FocusState private var focus: Field?
   
   @FetchAll(Suggestion.none) var suggestions: [Suggestion]
   
@@ -33,7 +38,9 @@ struct ItemFormView: View {
       
       Section {
         TextField(.itemFormTextfieldLabel, text: $item.description)
+          .focused($focus, equals: .description)
           .padding()
+          .onAppear { focus = .description }
         
         if !suggestions.isEmpty {
           FlowLayout {
@@ -136,7 +143,7 @@ private struct TimeShortcuts: View {
         Image(systemName: "10.arrow.trianglehead.counterclockwise")
       }
     }
-    .buttonStyle(.bordered)
+    .buttonStyle(.borderedProminent)
   }
 }
 
