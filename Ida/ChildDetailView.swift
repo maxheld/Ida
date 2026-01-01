@@ -81,6 +81,9 @@ struct ChildDetailView: View {
         .buttonStyle(.glassProminent)
       }
     }
+    .sheet(item: $sharedRecord) { sharedRecord in
+      CloudSharingView(sharedRecord: sharedRecord)
+    }
   }
 
   func deleteRows(groupDay: Date, at indexSet: IndexSet) {
