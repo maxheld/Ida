@@ -90,7 +90,7 @@ struct ItemFormView: View {
   }
   
   private func task() async {
-    await withErrorReporting {
+    _ = await withErrorReporting {
       try await $suggestions.load(
         Item
           .where { $0.childID.eq(item.childID) }
@@ -143,7 +143,7 @@ private struct TimeShortcuts: View {
         Image(systemName: "10.arrow.trianglehead.counterclockwise")
       }
     }
-    .buttonStyle(.borderedProminent)
+    .buttonStyle(.glass)
   }
 }
 
