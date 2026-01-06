@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0F49BBF82ECDFB420035ACDF"
-               BuildableName = "Ida - Baby Activity Logger.app"
+               BuildableName = "Ida: Baby Activity Logger.app"
                BlueprintName = "Ida"
                ReferencedContainer = "container:Ida.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0F49BBF82ECDFB420035ACDF"
-            BuildableName = "Ida - Baby Activity Logger.app"
+            BuildableName = "Ida: Baby Activity Logger.app"
             BlueprintName = "Ida"
             ReferencedContainer = "container:Ida.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0F49BBF82ECDFB420035ACDF"
-            BuildableName = "Ida - Baby Activity Logger.app"
+            BuildableName = "Ida: Baby Activity Logger.app"
             BlueprintName = "Ida"
             ReferencedContainer = "container:Ida.xcodeproj">
          </BuildableReference>
