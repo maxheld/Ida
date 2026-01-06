@@ -77,7 +77,7 @@ struct ItemFormView: View {
         }
       }
     }
-    .task { await task() }
+    .task(id: item.description) { await task() }
   }
   
   private func saveButtonTapped() {
@@ -94,6 +94,13 @@ struct ItemFormView: View {
       try await $suggestions.load(
         Item
           .where { $0.childID.eq(item.childID) }
+          .where {
+            if item.description != "" {
+              $0.description.contains(item.description)
+            } else {
+              true
+            }
+          }
           .order { $0.date.desc() }
           .distinct()
           .select { Suggestion.Columns(description: $0.description) }
