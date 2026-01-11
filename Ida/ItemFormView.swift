@@ -48,6 +48,8 @@ struct ItemFormView: View {
               Button(suggestion.description) {
                 item.description = suggestion.description
               }
+              .multilineTextAlignment(.leading)
+              .lineLimit(nil)
             }
             .buttonStyle(.bordered)
           }
@@ -154,71 +156,96 @@ private struct TimeShortcuts: View {
 private struct FlowLayout: Layout {
   var spacing: CGFloat = 4
   var rowSpacing: CGFloat = 4
-  var alignment: HorizontalAlignment = .leading
+  
+  struct Cache {
+    var frames: [CGRect] = []
+    var size: CGSize = .zero
+  }
+  
+  func makeCache(subviews: Subviews) -> Cache {
+    Cache(frames: Array(repeating: .zero, count: subviews.count))
+  }
+  
+  func updateCache(_ cache: inout Cache, subviews: Subviews) {
+    if cache.frames.count != subviews.count {
+      cache.frames = Array(repeating: .zero, count: subviews.count)
+    }
+  }
   
   func sizeThatFits(
     proposal: ProposedViewSize,
     subviews: Subviews,
-    cache: inout ()
+    cache: inout Cache
   ) -> CGSize {
-    let maxWidth = proposal.width ?? .infinity
+    updateCache(&cache, subviews: subviews)
+    
+    // If parent doesn't propose a width, don't force wrapping (we'll compute natural width).
+    let proposedWidth = proposal.width
+    let maxWidth = proposedWidth ?? .greatestFiniteMagnitude
+    
     var x: CGFloat = 0
     var y: CGFloat = 0
     var rowHeight: CGFloat = 0
+    var usedWidth: CGFloat = 0
     
-    for subview in subviews {
-      let size = subview.sizeThatFits(.unspecified)
+    func measure(_ subview: Subviews.Element, constrainedTo width: CGFloat) -> CGSize {
+      // First try "ideal"
+      var size = subview.sizeThatFits(.unspecified)
       
-      if x + size.width > maxWidth {
-        // wrap to next line
+      // If it doesn't fit, propose a width so Text inside can wrap.
+      if size.width > width {
+        size = subview.sizeThatFits(ProposedViewSize(width: width, height: proposal.height))
+        size.width = min(size.width, width)
+      }
+      
+      return size
+    }
+    
+    for index in subviews.indices {
+      // Remaining space in current row; if we're at row start, it's full width.
+      let remaining = maxWidth - x
+      var size = measure(subviews[index], constrainedTo: maxWidth)
+      
+      // If it doesn't fit in remaining space, move to next row.
+      if x > 0, size.width > remaining {
         x = 0
         y += rowHeight + rowSpacing
         rowHeight = 0
+        
+        // Re-measure for the new row (full width available).
+        size = measure(subviews[index], constrainedTo: maxWidth)
       }
       
-      rowHeight = max(rowHeight, size.height)
+      cache.frames[index] = CGRect(x: x, y: y, width: size.width, height: size.height)
+      
       x += size.width + spacing
+      rowHeight = max(rowHeight, size.height)
+      
+      usedWidth = max(usedWidth, x == 0 ? 0 : (x - spacing))
     }
     
-    return CGSize(
-      width: maxWidth,
-      height: y + rowHeight
-    )
+    let totalHeight = subviews.isEmpty ? 0 : (y + rowHeight)
+    let finalWidth = proposedWidth ?? usedWidth
+    
+    cache.size = CGSize(width: finalWidth, height: totalHeight)
+    return cache.size
   }
   
   func placeSubviews(
     in bounds: CGRect,
     proposal: ProposedViewSize,
     subviews: Subviews,
-    cache: inout ()
+    cache: inout Cache
   ) {
-    let maxWidth = bounds.width
-    var x: CGFloat = 0
-    var y: CGFloat = 0
-    var rowHeight: CGFloat = 0
+    // Ensure frames are computed for the current proposal.
+    _ = sizeThatFits(proposal: proposal, subviews: subviews, cache: &cache)
     
-    for subview in subviews {
-      let size = subview.sizeThatFits(.unspecified)
-      
-      if x + size.width > maxWidth {
-        // wrap to next line
-        x = 0
-        y += rowHeight + rowSpacing
-        rowHeight = 0
-      }
-      
-      let origin = CGPoint(
-        x: bounds.minX + x,
-        y: bounds.minY + y
+    for index in subviews.indices {
+      let frame = cache.frames[index].offsetBy(dx: bounds.minX, dy: bounds.minY)
+      subviews[index].place(
+        at: frame.origin,
+        proposal: ProposedViewSize(width: frame.width, height: frame.height)
       )
-      
-      subview.place(
-        at: origin,
-        proposal: ProposedViewSize(width: size.width, height: size.height)
-      )
-      
-      rowHeight = max(rowHeight, size.height)
-      x += size.width + spacing
     }
   }
 }
