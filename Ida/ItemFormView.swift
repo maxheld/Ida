@@ -22,6 +22,8 @@ struct ItemFormView: View {
   @FocusState private var focus: Field?
   
   @FetchAll(Suggestion.none) var suggestions: [Suggestion]
+  @FetchAll(Suggestion.none) var emojiSuggestions: [Suggestion]
+  @State var frequentlyUsedEmojis: [String] = []
   
   var body: some View {
     Form {
@@ -43,6 +45,23 @@ struct ItemFormView: View {
           .onAppear { focus = .description }
         
         if !suggestions.isEmpty {
+          if !frequentlyUsedEmojis.isEmpty {
+            ScrollView(.horizontal, showsIndicators: true) {
+              HStack {
+                ForEach(frequentlyUsedEmojis, id: \.self) { emoji in
+                  Button(emoji) {
+                    if item.description != "" {
+                      item.description.append(" \(emoji)")
+                    } else {
+                      item.description = emoji
+                    }
+                  }
+                }
+                .buttonStyle(.bordered)
+              }
+            }
+          }
+          
           FlowLayout {
             ForEach(suggestions) { suggestion in
               Button(suggestion.description) {
@@ -88,22 +107,44 @@ struct ItemFormView: View {
   }
   
   private func task() async {
-    _ = await withErrorReporting {
-      try await $suggestions.load(
-        Item
-          .where { $0.childID.eq(item.childID) }
-          .where {
-            if item.description != "" {
-              $0.description.contains(item.description)
-            } else {
-              true
-            }
-          }
-          .order { $0.date.desc() }
-          .distinct()
-          .select { Suggestion.Columns(description: $0.description) }
-      )
+    await withTaskGroup(of: Void.self) { group in
+      group.addTask(priority: .userInitiated) { @MainActor in
+        _ = await withErrorReporting {
+          try await $suggestions.load(
+            Item
+              .where { $0.childID.eq(item.childID) }
+              .where {
+                if item.description != "" {
+                  $0.description.contains(item.description)
+                } else {
+                  true
+                }
+              }
+              .order { $0.date.desc() }
+              .distinct()
+              .select { Suggestion.Columns(description: $0.description) }
+          )
+        }
+      }
+      group.addTask { @MainActor in
+        _ = await withErrorReporting {
+          try await $emojiSuggestions.load(
+            Item
+              .where { $0.childID.eq(item.childID) }
+              .where {
+                if item.description != "" {
+                  $0.description.contains(item.description)
+                } else {
+                  true
+                }
+              }
+              .order { $0.date.desc() }
+              .select { Suggestion.Columns(description: $0.description) }
+          )
+        }
+      }
     }
+    self.frequentlyUsedEmojis = uniqueEmojisByFrequency(in: emojiSuggestions.map(\.description))
   }
 }
 
@@ -151,7 +192,6 @@ private struct TimeShortcuts: View {
     .buttonStyle(.glass)
   }
 }
-
 
 private struct FlowLayout: Layout {
   var spacing: CGFloat = 4
@@ -248,4 +288,54 @@ private struct FlowLayout: Layout {
       )
     }
   }
+}
+
+// MARK: Private helpers
+
+extension Character {
+  /// Heuristic emoji detection for single-scalar and multi-scalar emoji grapheme clusters.
+  var isEmoji: Bool {
+    guard let firstScalar = unicodeScalars.first else { return false }
+    
+    let containsEmojiScalar = unicodeScalars.contains { $0.properties.isEmoji }
+    if !containsEmojiScalar { return false }
+    
+    return unicodeScalars.count > 1
+    || firstScalar.properties.isEmojiPresentation
+    || firstScalar.value > 0x238C
+  }
+}
+
+/// Returns unique emojis sorted by frequency (highest first) across multiple strings.
+/// Tie-breaker: first time the emoji appeared across all inputs (earlier first).
+func uniqueEmojisByFrequency(in texts: [String]) -> [String] {
+  var counts: [String: Int] = [:]
+  var firstSeenIndex: [String: Int] = [:]
+  var nextIndex = 0
+  
+  for text in texts {
+    for character in text where character.isEmoji {
+      let emoji = String(character)
+      counts[emoji, default: 0] += 1
+      
+      if firstSeenIndex[emoji] == nil {
+        firstSeenIndex[emoji] = nextIndex
+        nextIndex += 1
+      }
+    }
+  }
+  
+  return counts.keys.sorted { a, b in
+    let ca = counts[a, default: 0]
+    let cb = counts[b, default: 0]
+    if ca != cb { return ca > cb } // most frequent first
+    
+    // deterministic tie-breaker: earlier first appearance
+    return (firstSeenIndex[a] ?? Int.max) < (firstSeenIndex[b] ?? Int.max)
+  }
+}
+
+/// Variadic convenience overload.
+func uniqueEmojisByFrequency(_ texts: String...) -> [String] {
+  uniqueEmojisByFrequency(in: texts)
 }
