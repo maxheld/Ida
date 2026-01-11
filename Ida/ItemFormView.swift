@@ -46,11 +46,7 @@ struct ItemFormView: View {
           FlowLayout {
             ForEach(suggestions) { suggestion in
               Button(suggestion.description) {
-                if item.description != "" {
-                  item.description.append(" \(suggestion.description)")
-                } else {
-                  item.description = suggestion.description
-                }
+                item.description = suggestion.description
               }
             }
             .buttonStyle(.bordered)
