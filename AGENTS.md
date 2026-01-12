@@ -30,6 +30,19 @@
 - Name test files `*Tests.swift` and keep test methods small and focused.
 - Prefer running `xcodebuild test` before opening a PR.
 
+## SQLiteData Testing Notes
+- Follow the sqlite-data Examples tests as the canonical style guide:
+  - `Examples/RemindersTests/Internal.swift` (base suite + dependency setup)
+  - `Examples/SyncUpTests/SyncUpFormTests.swift` (database usage in tests)
+- Use `DependenciesTestSupport` + `@Suite` traits to prepare test dependencies:
+  - `.dependency(\.context, .test)`
+  - `.dependency(\.date.now, ...)`
+  - `.dependency(\.uuid, .incrementing)`
+  - `.dependencies { try $0.bootstrapDatabase(seedData: true) }`
+- In tests, rely on `@Dependency(\.defaultDatabase)` and app-layer APIs/queries rather than duplicating schema or writing low-level SQL migrations.
+- For empty-database scenarios, override per test with a suite/test dependency: `.dependencies { try $0.bootstrapDatabase(seedData: false) }`.
+- If a test needs extra packages (e.g., `DependenciesTestSupport`), add the product to the `IdaTests` target in `Ida.xcodeproj`.
+
 ## Commit & Pull Request Guidelines
 - Recent commits use short, imperative summaries (e.g., “Add search suggestions to add item”).
 - Keep commit subjects under ~72 characters when possible.
