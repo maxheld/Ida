@@ -44,24 +44,24 @@ struct ItemFormView: View {
           .padding()
           .onAppear { focus = .description }
         
-        if !suggestions.isEmpty {
-          if !frequentlyUsedEmojis.isEmpty {
-            ScrollView(.horizontal, showsIndicators: true) {
-              HStack {
-                ForEach(frequentlyUsedEmojis, id: \.self) { emoji in
-                  Button(emoji) {
-                    if item.description != "" {
-                      item.description.append(" \(emoji)")
-                    } else {
-                      item.description = emoji
-                    }
+        if !frequentlyUsedEmojis.isEmpty {
+          ScrollView(.horizontal, showsIndicators: true) {
+            HStack {
+              ForEach(frequentlyUsedEmojis, id: \.self) { emoji in
+                Button(emoji) {
+                  if item.description != "" {
+                    item.description.append(" \(emoji)")
+                  } else {
+                    item.description = emoji
                   }
                 }
-                .buttonStyle(.bordered)
               }
+              .buttonStyle(.bordered)
             }
           }
-          
+        }
+        
+        if !suggestions.isEmpty {
           FlowLayout {
             ForEach(suggestions) { suggestion in
               Button(suggestion.description) {
@@ -94,7 +94,8 @@ struct ItemFormView: View {
         }
       }
     }
-    .task(id: item.description) { await task() }
+    .task(id: item.description) { await loadSuggestionsTask() }
+    .task { await loadEmojiSuggestionsTask() }
   }
   
   private func saveButtonTapped() {
@@ -106,43 +107,34 @@ struct ItemFormView: View {
     dismiss()
   }
   
-  private func task() async {
-    await withTaskGroup(of: Void.self) { group in
-      group.addTask(priority: .userInitiated) { @MainActor in
-        _ = await withErrorReporting {
-          try await $suggestions.load(
-            Item
-              .where { $0.childID.eq(item.childID) }
-              .where {
-                if item.description != "" {
-                  $0.description.contains(item.description)
-                } else {
-                  true
-                }
-              }
-              .order { $0.date.desc() }
-              .distinct()
-              .select { Suggestion.Columns(description: $0.description) }
-          )
-        }
-      }
-      group.addTask { @MainActor in
-        _ = await withErrorReporting {
-          try await $emojiSuggestions.load(
-            Item
-              .where { $0.childID.eq(item.childID) }
-              .where {
-                if item.description != "" {
-                  $0.description.contains(item.description)
-                } else {
-                  true
-                }
-              }
-              .order { $0.date.desc() }
-              .select { Suggestion.Columns(description: $0.description) }
-          )
-        }
-      }
+  private func loadSuggestionsTask() async {
+    _ = await withErrorReporting {
+      try await $suggestions.load(
+        Item
+          .where { $0.childID.eq(item.childID) }
+          .where {
+            if item.description != "" {
+              $0.description.contains(item.description)
+            } else {
+              true
+            }
+          }
+          .order { $0.date.desc() }
+          .distinct()
+          .select { Suggestion.Columns(description: $0.description) },
+        animation: .default
+      )
+    }
+  }
+  
+  private func loadEmojiSuggestionsTask() async {
+    _ = await withErrorReporting {
+      try await $emojiSuggestions.load(
+        Item
+          .where { $0.childID.eq(item.childID) }
+          .select { Suggestion.Columns(description: $0.description) },
+        animation: .default
+      )
     }
     self.frequentlyUsedEmojis = uniqueEmojisByFrequency(in: emojiSuggestions.map(\.description))
   }
