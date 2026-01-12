@@ -71,8 +71,8 @@ struct ChildEntityQuery: EntityQuery, EntityStringQuery {
 }
 
 struct LogActivityIntent: AppIntent {
-  static var title: LocalizedStringResource = "intent.log.activity.title"
-  static var description = IntentDescription("intent.log.activity.description")
+  static let title: LocalizedStringResource = "intent.log.activity.title"
+  static let description = IntentDescription("intent.log.activity.description")
 
   static var parameterSummary: some ParameterSummary {
     Summary("Log \(\.$entryDescription) for \(\.$child) at \(\.$date)")
@@ -128,8 +128,8 @@ struct LogActivityIntent: AppIntent {
 }
 
 struct LogRecentActivityIntent: AppIntent {
-  static var title: LocalizedStringResource = "intent.log.recent.title"
-  static var description = IntentDescription("intent.log.recent.description")
+  static let title: LocalizedStringResource = "intent.log.recent.title"
+  static let description = IntentDescription("intent.log.recent.description")
 
   static var parameterSummary: some ParameterSummary {
     Summary("Log \(\.$entryDescription) for the most recent child")
