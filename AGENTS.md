@@ -2,6 +2,7 @@
 
 ## Project Structure & Module Organization
 - `Ida/` contains the SwiftUI app sources (views, models, app entry, `Info.plist`).
+- `Ida/Schema.swift` defines the SQLiteData tables, migrations, and CloudKit sync bootstrap.
 - `Ida/Assets.xcassets/` holds app icons and color assets.
 - `Ida/Localizable.xcstrings` defines localized strings used across the UI.
 - `IdaTests/` contains unit tests; `IdaUITests/` contains UI tests.
@@ -18,12 +19,14 @@
 
 ## Coding Style & Naming Conventions
 - Swift and SwiftUI code in `Ida/` uses 2-space indentation; follow existing formatting.
+- Tests follow existing formatting (UI tests currently use Xcode’s default 4-space indentation).
 - Types use PascalCase (e.g., `ChildDetailView`); properties and methods use camelCase.
 - File names typically match the primary type in the file (e.g., `ChildListView.swift`).
 - Add new localized strings to `Ida/Localizable.xcstrings` and reference them via `Text` or `LocalizedStringKey`.
 
 ## Testing Guidelines
-- Tests use Swift Testing (`import Testing`) in `IdaTests/` and `IdaUITests/`.
+- Unit tests in `IdaTests/` use Swift Testing (`import Testing`).
+- UI tests in `IdaUITests/` use XCTest (`import XCTest`).
 - Name test files `*Tests.swift` and keep test methods small and focused.
 - Prefer running `xcodebuild test` before opening a PR.
 
@@ -35,6 +38,15 @@
 ## Configuration & Capabilities
 - CloudKit and entitlements live in `Ida/Ida.entitlements` and `Ida/Info.plist`; coordinate changes with the team.
 - CI scripts in `ci_scripts/` adjust Xcode validation defaults; keep them in sync with CI needs.
+
+## SQLiteData Reference (Point-Free)
+- Docs: `https://swiftpackageindex.com/pointfreeco/sqlite-data/main/documentation/sqlitedata/` (Swift Package Index DocC).
+- SQLiteData is a SwiftData-like API on top of SQLite (via GRDB); it uses value-type `@Table` models and property wrappers like `@FetchAll`/`@FetchOne` to fetch and observe data.
+- Initialize `defaultDatabase` early (app entry) via `prepareDependencies`, then access it with `@Dependency(\.defaultDatabase)` for reads/writes.
+- Writes go through `database.write { db in ... }` which wraps changes in a transaction; use `DatabaseMigrator` + `#sql` for schema/migrations.
+- Optional CloudKit sync is configured by setting `defaultSyncEngine = SyncEngine(for:defaultDatabase, tables: ...)`.
+- SQLite knowledge (schema design, queries, indexes) is expected for effective use.
+- In this repo, see `Ida/Schema.swift` for migrations + sync setup and `Ida/ChildListView.swift` / `Ida/ItemFormView.swift` for fetch/write usage.
 
 <skills_system priority="1">
 
