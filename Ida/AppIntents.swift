@@ -31,6 +31,7 @@ struct ChildEntity: AppEntity, Identifiable, Hashable, Sendable {
 struct ChildEntityQuery: EntityQuery, EntityStringQuery {
   func entities(for identifiers: [ChildEntity.ID]) async throws -> [ChildEntity] {
     @Dependencies.Dependency(\.defaultDatabase) var database
+    
     guard !identifiers.isEmpty else { return [] }
 
     let children = try await database.read { db in
@@ -54,7 +55,9 @@ struct ChildEntityQuery: EntityQuery, EntityStringQuery {
 
   func entities(matching string: String) async throws -> [ChildEntity] {
     @Dependencies.Dependency(\.defaultDatabase) var database
+    
     let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+    
     guard !trimmed.isEmpty else { return try await suggestedEntities() }
 
     let children = try await database.read { db in
@@ -87,10 +90,17 @@ struct LogActivityIntent: AppIntent {
   func perform() async throws -> some IntentResult {
     @Dependencies.Dependency(\.defaultDatabase) var database
 
-    let trimmed = entryDescription.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !trimmed.isEmpty else { throw LogActivityIntentError.missingDescription }
+    let trimmed = entryDescription
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+    
+    guard !trimmed.isEmpty else {
+      throw LogActivityIntentError.missingDescription
+    }
+
     let childName = child.name.trimmingCharacters(in: .whitespacesAndNewlines)
+    
     guard !childName.isEmpty else { throw LogActivityIntentError.childNotFound }
+    
     let childID = try await database.read { db in
       try Child
         .where { $0.name == childName }
@@ -100,15 +110,19 @@ struct LogActivityIntent: AppIntent {
         .id
     }
     guard let childID else { throw LogActivityIntentError.childNotFound }
+    
     do {
       try await database.write { db in
         try Item
-          .upsert { Item.Draft(childID: childID, date: date, description: trimmed) }
+          .upsert {
+            Item.Draft(childID: childID, date: date, description: trimmed)
+          }
           .execute(db)
       }
     } catch {
       throw LogActivityIntentError.saveFailed
     }
+    
     return .result()
   }
 }
@@ -128,8 +142,13 @@ struct LogRecentActivityIntent: AppIntent {
     @Dependencies.Dependency(\.defaultDatabase) var database
     @Dependencies.Dependency(\.date.now) var now
 
-    let trimmed = entryDescription.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !trimmed.isEmpty else { throw LogRecentActivityIntentError.missingDescription }
+    let trimmed = entryDescription
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+    
+    guard !trimmed.isEmpty else {
+      throw LogRecentActivityIntentError.missingDescription
+    }
+    
     let recentChildID = try await database.read { db in
       try Item
         .order { $0.date.desc() }
@@ -137,17 +156,28 @@ struct LogRecentActivityIntent: AppIntent {
         .first?
         .childID
     }
-    guard let recentChildID else { throw LogRecentActivityIntentError.missingRecentChild }
+    
+    guard let recentChildID else {
+      throw LogRecentActivityIntentError.missingRecentChild
+    }
+    
     do {
       let currentDate = now
       try await database.write { db in
         try Item
-          .upsert { Item.Draft(childID: recentChildID, date: currentDate, description: trimmed) }
+          .upsert {
+            Item.Draft(
+              childID: recentChildID,
+              date: currentDate,
+              description: trimmed
+            )
+          }
           .execute(db)
       }
     } catch {
       throw LogRecentActivityIntentError.saveFailed
     }
+    
     return .result()
   }
 }
