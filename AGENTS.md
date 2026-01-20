@@ -10,12 +10,16 @@
 - `ci_scripts/` includes CI helper scripts used by Xcode Cloud.
 
 ## Build, Test, and Development Commands
-- `xcodebuild -scheme Ida -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15' build`
-  - Builds the app for the simulator.
-- `xcodebuild test -scheme Ida -destination 'platform=iOS Simulator,name=iPhone 15'`
-  - Runs unit and UI tests.
+Always use XcodeBuildMCP for local builds on the iPhone 17 simulator.
+- Boot iPhone 17 (once per session):
+  - `mcp__xcodebuildmcp__session-set-defaults` with `projectPath`, `scheme: "Ida"`, `simulatorId: 27444936-D9E5-4E28-B81C-762DFF92FD21`, `configuration: "Debug"`, `useLatestOS: true`
+  - `mcp__xcodebuildmcp__boot_sim`
+- Build:
+  - `mcp__xcodebuildmcp__build_sim`
+- Test (if needed):
+  - `mcp__xcodebuildmcp__test_sim`
+Release builds still use the shared scheme:
 - `xcodebuild -scheme "Ida - Release" -configuration Release build`
-  - Produces a release build using the shared release scheme.
 
 ## Coding Style & Naming Conventions
 - Swift and SwiftUI code in `Ida/` uses 2-space indentation; follow existing formatting.
