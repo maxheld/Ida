@@ -64,6 +64,7 @@ struct ChildListView: View {
           isPresented: $isNewChildAlertPresented
         ) {
           TextField(.childListNewChildNameLabel, text: $newChildName)
+
           Button(.save) {
             withErrorReporting {
               try database.write { db in
@@ -73,6 +74,8 @@ struct ChildListView: View {
               }
             }
           }
+          .disabled(newChildName.isEmpty)
+          
           Button(.cancel, role: .cancel) { }
         }
       }
