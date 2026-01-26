@@ -75,7 +75,7 @@ struct ChildListView: View {
             }
           }
           .disabled(newChildName.isEmpty)
-          
+
           Button(.cancel, role: .cancel) { }
         }
       }
