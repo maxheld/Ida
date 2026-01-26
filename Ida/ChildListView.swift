@@ -4,7 +4,18 @@ import SwiftUI
 import SwiftUINavigation
 
 struct ChildListView: View {
-  @FetchAll(animation: .default) var children: [Child]
+  @Selection struct Row: Identifiable {
+    var id: UUID { child.id }
+    let child: Child
+    let isShared: Bool
+  }
+
+  @FetchAll(
+    Row.none,
+    animation: .default
+  )
+  var rows: [Row]
+
   @State var isNewChildAlertPresented = false
   @State var newChildName = ""
   
@@ -12,12 +23,18 @@ struct ChildListView: View {
   
   var body: some View {
     List {
-      if !children.isEmpty {
-        ForEach(children) { child in
+      if !rows.isEmpty {
+        ForEach(rows) { row in
           NavigationLink {
-            ChildDetailView(child: child)
+            ChildDetailView(child: row.child)
           } label: {
-            Text(child.name)
+            HStack {
+              if row.isShared {
+                Image(systemName: "checkmark.icloud.fill")
+                  .foregroundStyle(.accent)
+              }
+              Text(row.child.name)
+            }
           }
         }
         .onDelete { indexSet in
@@ -60,14 +77,29 @@ struct ChildListView: View {
         }
       }
     }
+    .task { await loadRows() }
   }
-  
+
+  private func loadRows() async {
+    _ = await withErrorReporting {
+      try await $rows.load(
+        Child
+          .order(by: \.name)
+          .leftJoin(SyncMetadata.all) { $0.syncMetadataID.eq($1.id) }
+          .select {
+            Row.Columns(child: $0, isShared: $1.isShared.ifnull(false))
+          },
+        animation: .default
+      )
+    }
+  }
+
   private func deleteRows(at indexSet: IndexSet) {
     withErrorReporting {
       try database.write { db in
         for index in indexSet {
           try Child
-            .find(children[index].id)
+            .find(rows[index].child.id)
             .delete()
             .execute(db)
         }

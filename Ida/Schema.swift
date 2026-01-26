@@ -18,7 +18,12 @@ nonisolated struct Child: Identifiable, Hashable {
 
 extension DependencyValues {
   mutating func bootstrapDatabase(seedData: Bool = false) throws {
-    let database = try SQLiteData.defaultDatabase()
+    var configuration = Configuration()
+    configuration.prepareDatabase { db in
+      try db.attachMetadatabase()
+    }
+
+    let database = try SQLiteData.defaultDatabase(configuration: configuration)
     logger.debug(
       """
       App database
