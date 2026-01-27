@@ -10,17 +10,25 @@ struct ChildListView: View {
     let isShared: Bool
   }
 
-  @FetchAll(
-    Row.none,
-    animation: .default
-  )
-  var rows: [Row]
+  @FetchAll var rows: [Row]
 
   @State var isNewChildAlertPresented = false
   @State var newChildName = ""
   
   @Dependency(\.defaultDatabase) var database
-  
+
+  init() {
+    _rows = FetchAll(
+      Child
+        .order(by: \.name)
+        .leftJoin(SyncMetadata.all) { $0.syncMetadataID.eq($1.id) }
+        .select {
+          Row.Columns(child: $0, isShared: $1.isShared.ifnull(false))
+        },
+      animation: .default
+    )
+  }
+
   var body: some View {
     List {
       if !rows.isEmpty {
@@ -79,21 +87,6 @@ struct ChildListView: View {
           Button(.cancel, role: .cancel) { }
         }
       }
-    }
-    .task { await loadRows() }
-  }
-
-  private func loadRows() async {
-    _ = await withErrorReporting {
-      try await $rows.load(
-        Child
-          .order(by: \.name)
-          .leftJoin(SyncMetadata.all) { $0.syncMetadataID.eq($1.id) }
-          .select {
-            Row.Columns(child: $0, isShared: $1.isShared.ifnull(false))
-          },
-        animation: .default
-      )
     }
   }
 

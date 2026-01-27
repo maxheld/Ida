@@ -9,11 +9,7 @@ struct ChildDetailView: View {
     case itemForm(Item.Draft)
   }
   
-  @FetchAll(
-    Item.none,
-    animation: .default
-  ) var items: [Item]
-  
+  @FetchAll var items: [Item]
   let child: Child
   
   var groupedItems: [(key: Date, value: [Item])] {
@@ -23,23 +19,39 @@ struct ChildDetailView: View {
       .sorted { $0.key > $1.key } // newest day first
   }
   
-  @State var destination: Destination?
-  @State var sharedRecord: SharedRecord?
-  @State var errorSheet: Error?
   @State var isPreparingSharedRecord = false
+  @State private var destination: Destination?
+  @State private var sharedRecord: SharedRecord?
+  @State private var caughtError: Error?
+  @State private var isPreparingSharedRecord = false
   @Dependency(\.defaultSyncEngine) var syncEngine
   @Dependency(\.defaultDatabase) var database
 
+  init(child: Child) {
+    self.child = child
+    self._items = FetchAll(
+      Item
+        .where { $0.childID.eq(child.id) }
+        .order { $0.date.desc() },
+      animation: .default
+    )
+  }
+
   var body: some View {
     List {
-      if let error = errorSheet {
+      if let error = caughtError {
         Text(error.localizedDescription)
           .foregroundStyle(Color.white)
           .listRowBackground(Color(uiColor: .systemRed))
           .task(id: error.localizedDescription) {
             try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 4)
-            withAnimation { errorSheet = nil }
+            withAnimation { caughtError = nil }
           }
+      }
+      if let error = $items.loadError {
+        Text(error.localizedDescription)
+          .foregroundStyle(Color.white)
+          .listRowBackground(Color(uiColor: .systemRed))
       }
       if !items.isEmpty {
         ForEach(groupedItems, id: \.key) { group in
@@ -59,6 +71,14 @@ struct ChildDetailView: View {
             }
           }
         }
+      } else if syncEngine.isLoading || $items.isLoading {
+        HStack(alignment: .center) {
+          ProgressView()
+            .progressViewStyle(.circular)
+
+          Text.init(.itemsLoading)
+        }
+        .frame(maxWidth: .infinity)
       } else {
         ContentUnavailableView(
           .childDetailEmptyTitle(child.name),
@@ -67,9 +87,8 @@ struct ChildDetailView: View {
         )
       }
     }
-    .task { await task() }
-    .sheet(item: $destination.itemForm, id: \.id) { itemDraft in
-      ItemFormSheet(itemDraft: itemDraft)
+    .sheet(item: $destination.itemForm, id: \.id) {
+      ItemFormSheet(itemDraft: $0)
     }
     .sheet(item: $sharedRecord) { CloudSharingView(sharedRecord: $0) }
     .navigationTitle(child.name)
@@ -131,19 +150,8 @@ struct ChildDetailView: View {
           share.publicPermission = .readWrite
         }
       } catch {
-        errorSheet = error
+        caughtError = error
       }
-    }
-  }
-
-  private func task() async {
-    _ = await withErrorReporting {
-      try await $items.load(
-        Item
-          .where { $0.childID.eq(child.id) }
-          .order { $0.date.desc() },
-        animation: .default
-      )
     }
   }
 }
