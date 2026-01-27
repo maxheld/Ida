@@ -19,7 +19,6 @@ struct ChildDetailView: View {
       .sorted { $0.key > $1.key } // newest day first
   }
   
-  @State var isPreparingSharedRecord = false
   @State private var destination: Destination?
   @State private var sharedRecord: SharedRecord?
   @State private var caughtError: Error?
