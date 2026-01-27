@@ -2,6 +2,7 @@ import CloudKit
 import SQLiteData
 import SwiftUI
 import SwiftUINavigation
+import UserNotifications
 
 struct ChildDetailView: View {
   @CasePathable
@@ -23,6 +24,7 @@ struct ChildDetailView: View {
   @State private var sharedRecord: SharedRecord?
   @State private var caughtError: Error?
   @State private var isPreparingSharedRecord = false
+  @State private var reminderChild: Child?
   @Dependency(\.defaultSyncEngine) var syncEngine
   @Dependency(\.defaultDatabase) var database
 
@@ -90,6 +92,7 @@ struct ChildDetailView: View {
       ItemFormSheet(itemDraft: $0)
     }
     .sheet(item: $sharedRecord) { CloudSharingView(sharedRecord: $0) }
+    .sheet(item: $reminderChild) { DailyReminderSheet(child: $0) }
     .navigationTitle(child.name)
     .toolbar {
       ToolbarItem(placement: .primaryAction) {
@@ -106,8 +109,14 @@ struct ChildDetailView: View {
       }
       
       ToolbarItemGroup(placement: .bottomBar) {
+        Button {
+          reminderChild = child
+        } label: {
+          Image(systemName: "bell.badge")
+        }
+
         Spacer()
-        
+
         Button {
           addButtonTapped()
         } label: {
@@ -147,6 +156,9 @@ struct ChildDetailView: View {
         sharedRecord = try await syncEngine.share(record: child) { share in
           share[CKShare.SystemFieldKey.title] = String(localized: "child.detail.share.title \(child.name)")
           share.publicPermission = .readWrite
+          share[CKShare.SystemFieldKey.thumbnailImageData] = UIImage(
+            systemName: "figure.2.and.child.holdinghands"
+          )?.pngData()
         }
       } catch {
         caughtError = error

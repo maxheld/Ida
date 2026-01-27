@@ -80,13 +80,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Drücke die + Taste, um die täglichen Aktivitäten Ihres Kindes zu protokollieren."
+            "value" : "Drücke die + Taste, um die täglichen Aktivitäten deines Kindes einzutragen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Press the + button to start tracking daily items for your child."
+            "value" : "Press the + button to start tracking daily entries for your child."
           }
         }
       }
@@ -301,7 +301,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktivität protokollieren"
+            "value" : "Aktivität eintragen"
           }
         },
         "en" : {
@@ -318,7 +318,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktivität protokollieren"
+            "value" : "Aktivität eintragen"
           }
         },
         "en" : {
@@ -369,7 +369,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schnell protokollieren"
+            "value" : "Schneller Eintrag"
           }
         },
         "en" : {
@@ -386,7 +386,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schnell protokollieren"
+            "value" : "Schneller Aktivitätseintrag"
           }
         },
         "en" : {
@@ -443,7 +443,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "New Item"
+            "value" : "New Entry"
           }
         }
       }
@@ -456,13 +456,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Einträge laden"
+            "value" : "Einträge werden geladen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Loading items"
+            "value" : "Loading entries"
           }
         }
       }
@@ -472,6 +472,227 @@
     },
     "Log ${entryDescription} for the most recent child" : {
 
+    },
+    "reminder.add.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Reminder"
+          }
+        }
+      }
+    },
+    "reminder.description.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eintragsbeschreibung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry description"
+          }
+        }
+      }
+    },
+    "reminder.description.placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eintragsbeschreibung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry description"
+          }
+        }
+      }
+    },
+    "reminder.edit.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Reminder"
+          }
+        }
+      }
+    },
+    "reminder.error.notificationsDenied" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benachrichtigungen sind für Ida deaktiviert. Aktiviere sie in den Einstellungen, um Erinnerungen zu nutzen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications are disabled for Ida. Enable them in Settings to use reminders."
+          }
+        }
+      }
+    },
+    "reminder.error.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung konnte nicht geplant werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't Schedule Reminder"
+          }
+        }
+      }
+    },
+    "reminder.list.empty.description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge eine Erinnerung hinzu, um täglich an einen Eintrag erinnert zu werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a reminder to get a daily prompt to log an entry."
+          }
+        }
+      }
+    },
+    "reminder.list.empty.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Erinnerungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Reminders Yet"
+          }
+        }
+      }
+    },
+    "reminder.notification.action.add" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eintrag hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log Entry"
+          }
+        }
+      }
+    },
+    "reminder.notification.body %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe auf „Eintrag hinzufügen“, um %@ einzutragen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap ‘Log Entry’ to log: %@."
+          }
+        }
+      }
+    },
+    "reminder.notification.title %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errinerung für %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminder for %@"
+          }
+        }
+      }
+    },
+    "reminder.sheet.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tägliche Erinnerungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daily Reminders"
+          }
+        }
+      }
+    },
+    "reminder.time.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhrzeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time"
+          }
+        }
+      }
     },
     "save" : {
       "extractionState" : "manual",

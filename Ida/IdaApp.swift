@@ -3,6 +3,7 @@ import CloudKit
 import SQLiteData
 import SwiftUI
 import SwiftUINavigation
+import UserNotifications
 
 @main
 struct IdaApp: App {
@@ -49,7 +50,54 @@ struct IdaApp: App {
   }
 }
 
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+  @Dependency(\.defaultDatabase) var database
+
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+  ) -> Bool {
+    let center = UNUserNotificationCenter.current()
+    center.delegate = self
+    center.registerCategories()
+
+    return true
+  }
+
+  func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+  ) {
+    completionHandler([.banner, .sound])
+  }
+
+  func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    defer { completionHandler() }
+
+    guard response.actionIdentifier == .addActionIdentifier else { return }
+    let userInfo = response.notification.request.content.userInfo
+
+    guard
+      let childIDString = userInfo[String.userInfoChildIDKey] as? String,
+      let childID = UUID(uuidString: childIDString)
+    else { return }
+
+    let description = userInfo[String.userInfoDescriptionKey] as? String ?? ""
+
+    withErrorReporting {
+      try database.write { db in
+        try Item
+          .upsert { Item.Draft(childID: childID, description: description) }
+          .execute(db)
+      }
+    }
+  }
+
   func application(
     _ application: UIApplication,
     configurationForConnecting connectingSceneSession: UISceneSession,
@@ -93,4 +141,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
   }
 }
-
