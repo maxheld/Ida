@@ -666,8 +666,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/sqlite-data";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.3.0;
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.5.0;
 			};
 		};
 		0F9862CA2ED4FB6F00E5B45C /* XCRemoteSwiftPackageReference "swiftui-navigation" */ = {
