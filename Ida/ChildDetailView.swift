@@ -13,11 +13,21 @@ struct ChildDetailView: View {
   @FetchAll var items: [Item]
   let child: Child
   
-  var groupedItems: [(key: Date, value: [Item])] {
-    let grouped = Dictionary(grouping: items) { $0.date.startOfDay() }
+  private var filteredItems: [Item] {
+    let trimmedSearch = searchText.trimmedForSearch
+    guard !trimmedSearch.isEmpty else { return items }
+    return items.filter { $0.description.fuzzyMatches(trimmedSearch) }
+  }
+  
+  private var groupedItems: [(key: Date, value: [Item])] {
+    let grouped = Dictionary(grouping: filteredItems) { $0.date.startOfDay() }
     
     return grouped
       .sorted { $0.key > $1.key } // newest day first
+  }
+  
+  private var isFiltering: Bool {
+    !searchText.trimmedForSearch.isEmpty
   }
   
   @State private var destination: Destination?
@@ -25,6 +35,7 @@ struct ChildDetailView: View {
   @State private var caughtError: Error?
   @State private var isPreparingSharedRecord = false
   @State private var reminderChild: Child?
+  @State private var searchText = ""
   @Dependency(\.defaultSyncEngine) var syncEngine
   @Dependency(\.defaultDatabase) var database
 
@@ -54,7 +65,7 @@ struct ChildDetailView: View {
           .foregroundStyle(Color.white)
           .listRowBackground(Color(uiColor: .systemRed))
       }
-      if !items.isEmpty {
+      if !groupedItems.isEmpty {
         ForEach(groupedItems, id: \.key) { group in
           Section(
             header: Text(group.key.customFormatted())
@@ -80,6 +91,8 @@ struct ChildDetailView: View {
           Text.init(.itemsLoading)
         }
         .frame(maxWidth: .infinity)
+      } else if isFiltering {
+        ContentUnavailableView.search(text: searchText.trimmedForSearch)
       } else {
         ContentUnavailableView(
           .childDetailEmptyTitle(child.name),
@@ -94,8 +107,14 @@ struct ChildDetailView: View {
     .sheet(item: $sharedRecord) { CloudSharingView(sharedRecord: $0) }
     .sheet(item: $reminderChild) { DailyReminderSheet(child: $0) }
     .navigationTitle(child.name)
+    .searchable(
+      text: $searchText,
+      placement: .toolbar,
+      prompt: Text(.childDetailSearchPlaceholder)
+    )
+    .searchToolbarBehavior(.minimize)
     .toolbar {
-      ToolbarItem(placement: .primaryAction) {
+      ToolbarItemGroup(placement: .topBarTrailing) {
         if syncEngine.isLoading || isPreparingSharedRecord {
           ProgressView()
             .progressViewStyle(.circular)
@@ -106,17 +125,19 @@ struct ChildDetailView: View {
             Image(systemName: "square.and.arrow.up")
           }
         }
-      }
-      
-      ToolbarItemGroup(placement: .bottomBar) {
+
         Button {
           reminderChild = child
         } label: {
           Image(systemName: "bell.badge")
         }
+      }
 
-        Spacer()
+      DefaultToolbarItem(kind: .search, placement: .bottomBar)
 
+      ToolbarSpacer(.flexible, placement: .bottomBar)
+
+      ToolbarItem(placement: .bottomBar) {
         Button {
           addButtonTapped()
         } label: {
@@ -196,6 +217,36 @@ private extension Date {
   }
 }
 
+private extension String {
+  var trimmedForSearch: String {
+    trimmingCharacters(in: .whitespacesAndNewlines)
+  }
+  
+  func fuzzyMatches(_ query: String) -> Bool {
+    let normalizedQuery = query.normalizedForSearch
+    guard !normalizedQuery.isEmpty else { return true }
+    let normalizedText = normalizedForSearch
+    
+    return normalizedQuery
+      .split(whereSeparator: \.isWhitespace)
+      .allSatisfy { token in
+        let tokenString = String(token)
+        if normalizedText.contains(tokenString) { return true }
+        var tokenIndex = tokenString.startIndex
+        for character in normalizedText {
+          if character == tokenString[tokenIndex] {
+            tokenIndex = tokenString.index(after: tokenIndex)
+            if tokenIndex == tokenString.endIndex { return true }
+          }
+        }
+        return false
+      }
+  }
+  
+  private var normalizedForSearch: String {
+    folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+  }
+}
 
 #Preview {
   let _ = try! prepareDependencies {
