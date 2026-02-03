@@ -44,23 +44,6 @@ struct ItemFormView: View {
           .padding()
           .onAppear { focus = .description }
         
-        if !frequentlyUsedEmojis.isEmpty {
-          ScrollView(.horizontal, showsIndicators: true) {
-            HStack {
-              ForEach(frequentlyUsedEmojis, id: \.self) { emoji in
-                Button(emoji) {
-                  if item.description != "" {
-                    item.description.append(" \(emoji)")
-                  } else {
-                    item.description = emoji
-                  }
-                }
-              }
-              .buttonStyle(.bordered)
-            }
-          }
-        }
-        
         if !suggestions.isEmpty {
           FlowLayout {
             ForEach(suggestions) { suggestion in
@@ -86,6 +69,27 @@ struct ItemFormView: View {
         .buttonStyle(.glassProminent)
         .disabled(item.description == "")
       }
+
+      ToolbarItemGroup(placement: .keyboard) {
+        if !frequentlyUsedEmojis.isEmpty {
+          ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+              ForEach(frequentlyUsedEmojis, id: \.self) { emoji in
+                Button(emoji) {
+                  if item.description != "" {
+                    item.description.append(" \(emoji)")
+                  } else {
+                    item.description = emoji
+                  }
+                }
+                .padding(.horizontal, 8)
+                .buttonStyle(.plain)
+              }
+            }
+          }
+        }
+      }
+
       ToolbarItem(placement: .cancellationAction) {
         Button {
           dismiss()
