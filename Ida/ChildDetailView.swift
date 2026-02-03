@@ -133,11 +133,11 @@ struct ChildDetailView: View {
         }
       }
 
-      DefaultToolbarItem(kind: .search, placement: .bottomBar)
+      DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
 
-      ToolbarSpacer(.flexible, placement: .bottomBar)
+      ToolbarItemGroup(placement: .bottomBar) {
+        Spacer()
 
-      ToolbarItem(placement: .bottomBar) {
         Button {
           addButtonTapped()
         } label: {
