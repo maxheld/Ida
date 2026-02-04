@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "App_Icon_Ida.png",
+      "filename" : "App Icon Light.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "App_Icon_Ida 1.png",
+      "filename" : "App Icon Dark Sleep.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +25,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "App_Icon_Ida 2.png",
+      "filename" : "App Icon Tinted Inverted.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
