@@ -175,10 +175,12 @@ struct ChildDetailView: View {
       defer { isPreparingSharedRecord = false }
       do {
         sharedRecord = try await syncEngine.share(record: child) { share in
-          share[CKShare.SystemFieldKey.title] = String(localized: "child.detail.share.title \(child.name)")
+          share[CKShare.SystemFieldKey.title] = String(
+            localized: "child.detail.share.title \(child.name)"
+          )
           share.publicPermission = .readWrite
           share[CKShare.SystemFieldKey.thumbnailImageData] = UIImage(
-            systemName: "figure.2.and.child.holdinghands"
+            named: "ShareAppIcon"
           )?.pngData()
         }
       } catch {
