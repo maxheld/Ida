@@ -36,7 +36,10 @@ let package = Package(
     ),
     .testTarget(
       name: "AppFeatureTests",
-      dependencies: ["AppFeature"],
+      dependencies: [
+        "AppFeature",
+        .product(name: "DependenciesTestSupport", package: "swift-dependencies")
+      ],
       path: "AppFeatureTests"
     )
   ]
