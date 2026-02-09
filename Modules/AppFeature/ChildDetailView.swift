@@ -4,7 +4,7 @@ import SwiftUI
 import SwiftUINavigation
 import UserNotifications
 
-struct ChildDetailView: View {
+public struct ChildDetailView: View {
   @CasePathable
   enum Destination {
     case itemForm(Item.Draft)
@@ -39,7 +39,7 @@ struct ChildDetailView: View {
   @Dependency(\.defaultSyncEngine) var syncEngine
   @Dependency(\.defaultDatabase) var database
 
-  init(child: Child) {
+  public init(child: Child) {
     self.child = child
     self._items = FetchAll(
       Item
@@ -49,7 +49,7 @@ struct ChildDetailView: View {
     )
   }
 
-  var body: some View {
+  public var body: some View {
     List {
       if let error = caughtError {
         Text(error.localizedDescription)

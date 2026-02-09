@@ -11,6 +11,7 @@
 		0F9862C12ECE1EC500E5B45C /* SQLiteDataTestSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 0F9862C02ECE1EC500E5B45C /* SQLiteDataTestSupport */; };
 		0F9862CC2ED4FB6F00E5B45C /* SwiftUINavigation in Frameworks */ = {isa = PBXBuildFile; productRef = 0F9862CB2ED4FB6F00E5B45C /* SwiftUINavigation */; };
 		0F9862CE2ED4FB6F00E5B45C /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0F9862CD2ED4FB6F00E5B45C /* SwiftUINavigationCore */; };
+		0FA6A0012F00000100E5B45C /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 0FA6A0032F00000100E5B45C /* AppFeature */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0FA6A0012F00000100E5B45C /* AppFeature in Frameworks */,
 				0F9862CC2ED4FB6F00E5B45C /* SwiftUINavigation in Frameworks */,
 				0F9862CE2ED4FB6F00E5B45C /* SwiftUINavigationCore in Frameworks */,
 				0F9862BF2ECE1EC500E5B45C /* SQLiteData in Frameworks */,
@@ -114,6 +116,7 @@
 			);
 			name = Ida;
 			packageProductDependencies = (
+				0FA6A0032F00000100E5B45C /* AppFeature */,
 				0F9862BE2ECE1EC500E5B45C /* SQLiteData */,
 				0F9862CB2ED4FB6F00E5B45C /* SwiftUINavigation */,
 				0F9862CD2ED4FB6F00E5B45C /* SwiftUINavigationCore */,
@@ -176,6 +179,7 @@
 			mainGroup = 0F49BBF02ECDFB420035ACDF;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				0FA6A0022F00000100E5B45C /* XCLocalSwiftPackageReference "Modules" */,
 				0F9862BD2ECE1EC500E5B45C /* XCRemoteSwiftPackageReference "sqlite-data" */,
 				0F9862CA2ED4FB6F00E5B45C /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 			);
@@ -533,6 +537,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		0FA6A0022F00000100E5B45C /* XCLocalSwiftPackageReference "Modules" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		0F9862BD2ECE1EC500E5B45C /* XCRemoteSwiftPackageReference "sqlite-data" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -572,6 +583,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0F9862CA2ED4FB6F00E5B45C /* XCRemoteSwiftPackageReference "swiftui-navigation" */;
 			productName = SwiftUINavigationCore;
+		};
+		0FA6A0032F00000100E5B45C /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0FA6A0022F00000100E5B45C /* XCLocalSwiftPackageReference "Modules" */;
+			productName = AppFeature;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

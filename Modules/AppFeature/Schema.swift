@@ -3,21 +3,21 @@ import OSLog
 import SQLiteData
 
 @Table
-nonisolated struct Item: Identifiable {
-  let id: UUID
-  let childID: Child.ID
-  var date: Date = .init()
-  var description: String = ""
+public nonisolated struct Item: Identifiable, Sendable {
+  public let id: UUID
+  public let childID: Child.ID
+  public var date: Date = .init()
+  public var description: String = ""
 }
 
 @Table
-nonisolated struct Child: Identifiable, Hashable {
-  let id: UUID
-  var name: String = ""
+public nonisolated struct Child: Identifiable, Hashable, Sendable {
+  public let id: UUID
+  public var name: String = ""
 }
 
 extension DependencyValues {
-  mutating func bootstrapDatabase(seedData: Bool = false) throws {
+  public mutating func bootstrapDatabase(seedData: Bool = false) throws {
     var configuration = Configuration()
     configuration.prepareDatabase { db in
       try db.attachMetadatabase()

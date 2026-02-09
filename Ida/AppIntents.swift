@@ -1,4 +1,5 @@
 import AppIntents
+import AppFeature
 import Dependencies
 import Foundation
 import SQLiteData

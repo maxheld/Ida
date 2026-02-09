@@ -5,3 +5,5 @@
 /.spm
 /build
 .DS_Store
+Ida.xcworkspace/xcuserdata/
+Ida.xcworkspace/xcuserdata/**

@@ -3,7 +3,7 @@ import SQLiteData
 import SwiftUI
 import SwiftUINavigation
 
-struct ChildListView: View {
+public struct ChildListView: View {
   @Selection struct Row: Identifiable {
     var id: UUID { child.id }
     let child: Child
@@ -14,10 +14,10 @@ struct ChildListView: View {
 
   @State var isNewChildAlertPresented = false
   @State var newChildName = ""
-  
+
   @Dependency(\.defaultDatabase) var database
 
-  init() {
+  public init() {
     _rows = FetchAll(
       Child
         .order(by: \.name)
@@ -29,7 +29,7 @@ struct ChildListView: View {
     )
   }
 
-  var body: some View {
+  public var body: some View {
     List {
       if !rows.isEmpty {
         ForEach(rows) { row in
@@ -39,7 +39,7 @@ struct ChildListView: View {
             HStack {
               if row.isShared {
                 Image(systemName: "checkmark.icloud.fill")
-                  .foregroundStyle(.accent)
+                  .foregroundStyle(Color.accentColor)
               }
               Text(row.child.name)
             }
@@ -60,7 +60,7 @@ struct ChildListView: View {
     .toolbar {
       ToolbarItemGroup(placement: .bottomBar) {
         Spacer()
-        
+
         Button {
           newChildName = ""
           isNewChildAlertPresented = true
