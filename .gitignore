@@ -3,3 +3,5 @@
 /.derivedData
 /.home
 /.spm
+/build
+.DS_Store
