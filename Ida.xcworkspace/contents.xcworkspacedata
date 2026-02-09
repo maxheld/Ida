@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:Modules/AppFeature.xctestplan">
-   </FileRef>
-   <FileRef
       location = "container:Ida.xcodeproj">
    </FileRef>
    <FileRef
