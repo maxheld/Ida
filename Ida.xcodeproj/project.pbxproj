@@ -21,19 +21,11 @@
 			remoteGlobalIDString = 0F49BBF82ECDFB420035ACDF;
 			remoteInfo = Ida;
 		};
-		0F49BC112ECDFB430035ACDF /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0F49BBF12ECDFB420035ACDF /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0F49BBF82ECDFB420035ACDF;
-			remoteInfo = Ida;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0F49BBF92ECDFB420035ACDF /* Ida: Baby Activity Logger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ida: Baby Activity Logger.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F49BC062ECDFB430035ACDF /* IdaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		0F49BC102ECDFB430035ACDF /* IdaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -60,11 +52,6 @@
 			path = IdaTests;
 			sourceTree = "<group>";
 		};
-		0F49BC132ECDFB430035ACDF /* IdaUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = IdaUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,13 +73,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0F49BC0D2ECDFB430035ACDF /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -101,7 +81,6 @@
 			children = (
 				0F49BBFB2ECDFB420035ACDF /* Ida */,
 				0F49BC092ECDFB430035ACDF /* IdaTests */,
-				0F49BC132ECDFB430035ACDF /* IdaUITests */,
 				0F49BBFA2ECDFB420035ACDF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -111,7 +90,6 @@
 			children = (
 				0F49BBF92ECDFB420035ACDF /* Ida: Baby Activity Logger.app */,
 				0F49BC062ECDFB430035ACDF /* IdaTests.xctest */,
-				0F49BC102ECDFB430035ACDF /* IdaUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -168,29 +146,6 @@
 			productReference = 0F49BC062ECDFB430035ACDF /* IdaTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		0F49BC0F2ECDFB430035ACDF /* IdaUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0F49BC202ECDFB430035ACDF /* Build configuration list for PBXNativeTarget "IdaUITests" */;
-			buildPhases = (
-				0F49BC0C2ECDFB430035ACDF /* Sources */,
-				0F49BC0D2ECDFB430035ACDF /* Frameworks */,
-				0F49BC0E2ECDFB430035ACDF /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				0F49BC122ECDFB430035ACDF /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				0F49BC132ECDFB430035ACDF /* IdaUITests */,
-			);
-			name = IdaUITests;
-			packageProductDependencies = (
-			);
-			productName = IdaUITests;
-			productReference = 0F49BC102ECDFB430035ACDF /* IdaUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -205,10 +160,6 @@
 						CreatedOnToolsVersion = 26.1.1;
 					};
 					0F49BC052ECDFB430035ACDF = {
-						CreatedOnToolsVersion = 26.1.1;
-						TestTargetID = 0F49BBF82ECDFB420035ACDF;
-					};
-					0F49BC0F2ECDFB430035ACDF = {
 						CreatedOnToolsVersion = 26.1.1;
 						TestTargetID = 0F49BBF82ECDFB420035ACDF;
 					};
@@ -235,7 +186,6 @@
 			targets = (
 				0F49BBF82ECDFB420035ACDF /* Ida */,
 				0F49BC052ECDFB430035ACDF /* IdaTests */,
-				0F49BC0F2ECDFB430035ACDF /* IdaUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -249,13 +199,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		0F49BC042ECDFB430035ACDF /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0F49BC0E2ECDFB430035ACDF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -279,13 +222,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0F49BC0C2ECDFB430035ACDF /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -293,11 +229,6 @@
 			isa = PBXTargetDependency;
 			target = 0F49BBF82ECDFB420035ACDF /* Ida */;
 			targetProxy = 0F49BC072ECDFB430035ACDF /* PBXContainerItemProxy */;
-		};
-		0F49BC122ECDFB430035ACDF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 0F49BBF82ECDFB420035ACDF /* Ida */;
-			targetProxy = 0F49BC112ECDFB430035ACDF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -570,56 +501,6 @@
 			};
 			name = Release;
 		};
-		0F49BC212ECDFB430035ACDF /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N8BZ833L9R;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.maxheld.IdaUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Ida;
-				XROS_DEPLOYMENT_TARGET = 26.1;
-			};
-			name = Debug;
-		};
-		0F49BC222ECDFB430035ACDF /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = N8BZ833L9R;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
-				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.maxheld.IdaUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = Ida;
-				XROS_DEPLOYMENT_TARGET = 26.1;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -646,15 +527,6 @@
 			buildConfigurations = (
 				0F49BC1E2ECDFB430035ACDF /* Debug */,
 				0F49BC1F2ECDFB430035ACDF /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		0F49BC202ECDFB430035ACDF /* Build configuration list for PBXNativeTarget "IdaUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				0F49BC212ECDFB430035ACDF /* Debug */,
-				0F49BC222ECDFB430035ACDF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -41,17 +41,6 @@
                ReferencedContainer = "container:Ida.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0F49BC0F2ECDFB430035ACDF"
-               BuildableName = "IdaUITests.xctest"
-               BlueprintName = "IdaUITests"
-               ReferencedContainer = "container:Ida.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
