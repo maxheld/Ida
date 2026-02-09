@@ -5,12 +5,13 @@
 - `Ida/Schema.swift` defines the SQLiteData tables, migrations, and CloudKit sync bootstrap.
 - `Ida/Assets.xcassets/` holds app icons and color assets.
 - `Ida/Localizable.xcstrings` defines localized strings used across the UI.
-- `IdaTests/` contains unit tests; `IdaUITests/` contains UI tests.
+- `IdaTests/` contains unit tests.
 - `Ida.xcodeproj/` stores the Xcode project and shared schemes.
 - `ci_scripts/` includes CI helper scripts used by Xcode Cloud.
 
 ## Build, Test, and Development Commands
 Always use XcodeBuildMCP for local builds on the iPhone 17 simulator.
+- Always use XcodeBuildMCP for debugging and app launching workflows (launch, log capture, screenshots, UI snapshots, stop/relaunch). Do not use non-MCP launch/debug flows.
 - Boot iPhone 17 (once per session):
   - `mcp__xcodebuildmcp__session-set-defaults` with `projectPath`, `scheme: "Ida"`, `simulatorId: 27444936-D9E5-4E28-B81C-762DFF92FD21`, `configuration: "Debug"`, `useLatestOS: true`
   - `mcp__xcodebuildmcp__boot_sim`
@@ -18,21 +19,36 @@ Always use XcodeBuildMCP for local builds on the iPhone 17 simulator.
   - `mcp__xcodebuildmcp__build_sim`
 - Test (if needed):
   - `mcp__xcodebuildmcp__test_sim`
+- Debug/launch/logging:
+  - `mcp__xcodebuildmcp__launch_app_sim`
+  - `mcp__xcodebuildmcp__launch_app_logs_sim`
+  - `mcp__xcodebuildmcp__start_sim_log_cap`
+  - `mcp__xcodebuildmcp__stop_sim_log_cap`
+  - `mcp__xcodebuildmcp__screenshot`
+  - `mcp__xcodebuildmcp__snapshot_ui`
 Release builds still use the shared scheme:
 - `xcodebuild -scheme "Ida - Release" -configuration Release build`
 
 ## Coding Style & Naming Conventions
 - Swift and SwiftUI code in `Ida/` uses 2-space indentation; follow existing formatting.
-- Tests follow existing formatting (UI tests currently use Xcode’s default 4-space indentation).
+- Tests follow existing formatting.
 - Types use PascalCase (e.g., `ChildDetailView`); properties and methods use camelCase.
 - File names typically match the primary type in the file (e.g., `ChildListView.swift`).
 - Add new localized strings to `Ida/Localizable.xcstrings` and reference them via `Text` or `LocalizedStringKey`.
 
 ## Testing Guidelines
 - Unit tests in `IdaTests/` use Swift Testing (`import Testing`).
-- UI tests in `IdaUITests/` use XCTest (`import XCTest`).
+- There is currently no UI test target in this repo; add one if UI coverage is needed.
 - Name test files `*Tests.swift` and keep test methods small and focused.
-- Prefer running `xcodebuild test` before opening a PR.
+- Prefer running `mcp__xcodebuildmcp__test_sim` before opening a PR.
+
+## Refactor Learnings (ChildListModel)
+- `ChildListView` logic is extracted into `@MainActor @Observable` `ChildListModel`; keep the view focused on rendering and user-event forwarding.
+- In `@Observable` models that use SQLiteData, annotate `@FetchAll`/`@FetchOne`/`@Fetch` and `@Dependency` properties with `@ObservationIgnored`.
+- Keep model injection explicit in views (`init(model: ChildListModel = .init())`) to support targeted unit tests.
+- For model tests, use `@Suite` traits with deterministic dependencies (`.dependency(\.context, .test)`, `.dependency(\.date.now, ...)`, `.dependency(\.uuid, .incrementing)`) and bootstrap via `.dependencies { try $0.bootstrapDatabase(seedData: false) }`.
+- Keep app module importable in tests as `Ida` by setting `PRODUCT_MODULE_NAME = Ida` in app target build settings.
+- Keep `IdaTests` `TEST_HOST` aligned with the real app bundle/executable name (`Ida: Baby Activity Logger.app` / `Ida: Baby Activity Logger`) to avoid host resolution failures.
 
 ## SQLiteData Testing Notes
 - Follow the sqlite-data Examples tests as the canonical style guide:
