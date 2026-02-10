@@ -174,7 +174,7 @@ public struct ChildDetailView: View {
       ItemFormSheet(itemDraft: $0)
     }
     .sheet(item: $model.sharedRecord) { CloudSharingView(sharedRecord: $0) }
-    .sheet(item: $model.reminderChild) { DailyReminderSheet(child: $0) }
+    .sheet(item: $model.reminderChild) { ReminderSheet(child: $0) }
     .navigationTitle(model.child.name)
     .searchable(
       text: $model.searchText,

@@ -1,12 +1,28 @@
 import UserNotifications
 
-struct ScheduledReminder: Identifiable {
+nonisolated struct ScheduledReminder: Identifiable, Sendable, Equatable {
   let id: String
   let timeText: String
   let description: String
   let sortKey: Int
   let hour: Int
   let minute: Int
+
+  init(
+    id: String,
+    timeText: String,
+    description: String,
+    sortKey: Int,
+    hour: Int,
+    minute: Int
+  ) {
+    self.id = id
+    self.timeText = timeText
+    self.description = description
+    self.sortKey = sortKey
+    self.hour = hour
+    self.minute = minute
+  }
 
   init?(request: UNNotificationRequest, childID: Child.ID) {
     guard

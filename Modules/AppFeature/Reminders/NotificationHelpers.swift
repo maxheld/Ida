@@ -2,14 +2,14 @@ import Foundation
 import UserNotifications
 
 extension String {
-  public static let categoryIdentifier = "daily.item.reminder"
-  public static let addActionIdentifier = "daily.item.reminder.add"
-  public static let userInfoChildIDKey = "childID"
-  public static let userInfoDescriptionKey = "description"
+  public nonisolated static let categoryIdentifier = "daily.item.reminder"
+  public nonisolated static let addActionIdentifier = "daily.item.reminder.add"
+  public nonisolated static let userInfoChildIDKey = "childID"
+  public nonisolated static let userInfoDescriptionKey = "description"
 }
 
 extension UNUserNotificationCenter {
-  public func registerCategories() {
+  public nonisolated func registerCategories() {
     let addAction = UNNotificationAction(
       identifier: .addActionIdentifier,
       title: String(localized: "reminder.notification.action.add"),

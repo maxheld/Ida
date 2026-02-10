@@ -1,18 +1,51 @@
 import Dependencies
 import SwiftUI
 
-struct DailyReminderSheet: View {
+@Observable
+final class ReminderSheetModel {
   let child: Child
+  var reminders: [ScheduledReminder] = []
+  var isLoading = false
 
+  @ObservationIgnored @Dependency(\.reminderClient) var reminderClient
+
+  init(child: Child) {
+    self.child = child
+  }
+
+  func loadRemindersTask() async {
+    guard !isLoading else { return }
+    isLoading = true
+    defer { isLoading = false }
+
+    reminders = await reminderClient
+      .loadReminders(child.id)
+      .sorted { $0.sortKey < $1.sortKey }
+  }
+
+  func deleteReminders(at offsets: IndexSet) async {
+    let identifiers = offsets.map { reminders[$0].id }
+    await reminderClient.deleteReminders(identifiers)
+    await loadRemindersTask()
+  }
+}
+
+struct ReminderSheet: View {
   @Environment(\.dismiss) private var dismiss
-  @Dependency(\.notificationCenter) var notificationCenter
-  @State private var reminders: [ScheduledReminder] = []
-  @State private var isLoading = false
+  @State private var model: ReminderSheetModel
+
+  init(child: Child) {
+    _model = State(initialValue: .init(child: child))
+  }
+
+  init(model: ReminderSheetModel) {
+    _model = State(initialValue: model)
+  }
 
   var body: some View {
     NavigationStack {
       Group {
-        if reminders.isEmpty {
+        if model.reminders.isEmpty {
           ContentUnavailableView(
             .reminderListEmptyTitle,
             systemImage: "bell",
@@ -20,10 +53,10 @@ struct DailyReminderSheet: View {
           )
         } else {
           List {
-            ForEach(reminders) { reminder in
+            ForEach(model.reminders) { reminder in
               NavigationLink {
-                ReminderFormView(child: child, reminder: reminder) {
-                  await loadReminders()
+                ReminderFormView(child: model.child, reminder: reminder) {
+                  await model.loadRemindersTask()
                 }
               } label: {
                 HStack(alignment: .firstTextBaseline) {
@@ -42,7 +75,9 @@ struct DailyReminderSheet: View {
                 }
               }
             }
-            .onDelete(perform: deleteReminders)
+            .onDelete { offsets in
+              Task { await model.deleteReminders(at: offsets) }
+            }
           }
           .listStyle(.insetGrouped)
         }
@@ -52,8 +87,8 @@ struct DailyReminderSheet: View {
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
           NavigationLink {
-            ReminderFormView(child: child, reminder: nil) {
-              await loadReminders()
+            ReminderFormView(child: model.child, reminder: nil) {
+              await model.loadRemindersTask()
             }
           } label: {
             Image(systemName: "plus")
@@ -72,26 +107,6 @@ struct DailyReminderSheet: View {
     }
     .presentationDetents([.medium, .large])
     .presentationDragIndicator(.visible)
-    .task { await loadReminders() }
-  }
-
-  private func loadReminders() async {
-    guard !isLoading else { return }
-    isLoading = true
-    defer { isLoading = false }
-    let requests = await UNUserNotificationCenter.current().pendingNotificationRequests()
-    let filtered = requests.compactMap { request in
-      ScheduledReminder(request: request, childID: child.id)
-    }
-    reminders = filtered.sorted { lhs, rhs in
-      lhs.sortKey < rhs.sortKey
-    }
-  }
-
-  private func deleteReminders(at offsets: IndexSet) {
-    let identifiers = offsets.map { reminders[$0].id }
-    UNUserNotificationCenter.current()
-      .removePendingNotificationRequests(withIdentifiers: identifiers)
-    Task { await loadReminders() }
+    .task { await model.loadRemindersTask() }
   }
 }
