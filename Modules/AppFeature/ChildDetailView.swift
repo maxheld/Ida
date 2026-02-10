@@ -4,44 +4,50 @@ import SwiftUI
 import SwiftUINavigation
 import UserNotifications
 
-public struct ChildDetailView: View {
+@Observable
+public final class ChildDetailModel {
   @CasePathable
   enum Destination {
     case itemForm(Item.Draft)
   }
-  
-  @FetchAll var items: [Item]
+
   let child: Child
-  
-  private var filteredItems: [Item] {
+  @ObservationIgnored @FetchAll var items: [Item]
+
+  var destination: Destination?
+  var sharedRecord: SharedRecord?
+  var caughtError: Error?
+  var isPreparingSharedRecord = false
+  var reminderChild: Child?
+  var searchText = ""
+
+  @ObservationIgnored @Dependency(\.defaultSyncEngine) var syncEngine
+  @ObservationIgnored @Dependency(\.defaultDatabase) var database
+
+  var filteredItems: [Item] {
     let trimmedSearch = searchText.trimmedForSearch
     guard !trimmedSearch.isEmpty else { return items }
     return items.filter { $0.description.fuzzyMatches(trimmedSearch) }
   }
-  
-  private var groupedItems: [(key: Date, value: [Item])] {
+
+  var groupedItems: [(key: Date, value: [Item])] {
     let grouped = Dictionary(grouping: filteredItems) { $0.date.startOfDay() }
-    
+
     return grouped
       .sorted { $0.key > $1.key } // newest day first
   }
-  
-  private var isFiltering: Bool {
+
+  var isFiltering: Bool {
     !searchText.trimmedForSearch.isEmpty
   }
-  
-  @State private var destination: Destination?
-  @State private var sharedRecord: SharedRecord?
-  @State private var caughtError: Error?
-  @State private var isPreparingSharedRecord = false
-  @State private var reminderChild: Child?
-  @State private var searchText = ""
-  @Dependency(\.defaultSyncEngine) var syncEngine
-  @Dependency(\.defaultDatabase) var database
+
+  var isLoading: Bool {
+    syncEngine.isLoading || $items.isLoading
+  }
 
   public init(child: Child) {
     self.child = child
-    self._items = FetchAll(
+    _items = FetchAll(
       Item
         .where { $0.childID.eq(child.id) }
         .order { $0.date.desc() },
@@ -49,103 +55,8 @@ public struct ChildDetailView: View {
     )
   }
 
-  public var body: some View {
-    List {
-      if let error = caughtError {
-        Text(error.localizedDescription)
-          .foregroundStyle(Color.white)
-          .listRowBackground(Color(uiColor: .systemRed))
-          .task(id: error.localizedDescription) {
-            try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 4)
-            withAnimation { caughtError = nil }
-          }
-      }
-      if let error = $items.loadError {
-        Text(error.localizedDescription)
-          .foregroundStyle(Color.white)
-          .listRowBackground(Color(uiColor: .systemRed))
-      }
-      if !groupedItems.isEmpty {
-        ForEach(groupedItems, id: \.key) { group in
-          Section(
-            header: Text(group.key.customFormatted())
-          ) {
-            ForEach(group.value) { item in
-              Button {
-                destination = .itemForm(.init(item))
-              } label: {
-                ItemRow(item: item)
-                  .buttonStyle(.borderless)
-              }
-            }
-            .onDelete { indexSet in
-              deleteRows(groupDay: group.key, at: indexSet)
-            }
-          }
-        }
-      } else if syncEngine.isLoading || $items.isLoading {
-        HStack(alignment: .center) {
-          ProgressView()
-            .progressViewStyle(.circular)
-
-          Text.init(.itemsLoading)
-        }
-        .frame(maxWidth: .infinity)
-      } else if isFiltering {
-        ContentUnavailableView.search(text: searchText.trimmedForSearch)
-      } else {
-        ContentUnavailableView(
-          .childDetailEmptyTitle(child.name),
-          systemImage: "figure.2.and.child.holdinghands",
-          description: Text(.childDetailEmptyDescription)
-        )
-      }
-    }
-    .sheet(item: $destination.itemForm, id: \.id) {
-      ItemFormSheet(itemDraft: $0)
-    }
-    .sheet(item: $sharedRecord) { CloudSharingView(sharedRecord: $0) }
-    .sheet(item: $reminderChild) { DailyReminderSheet(child: $0) }
-    .navigationTitle(child.name)
-    .searchable(
-      text: $searchText,
-      placement: .toolbar,
-      prompt: Text(.childDetailSearchPlaceholder)
-    )
-    .searchToolbarBehavior(.minimize)
-    .toolbar {
-      ToolbarItemGroup(placement: .topBarTrailing) {
-        if syncEngine.isLoading || isPreparingSharedRecord {
-          ProgressView()
-            .progressViewStyle(.circular)
-        } else {
-          Button {
-            shareButtonTapped()
-          } label: {
-            Image(systemName: "square.and.arrow.up")
-          }
-        }
-
-        Button {
-          reminderChild = child
-        } label: {
-          Image(systemName: "bell.badge")
-        }
-      }
-
-      DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
-
-      ToolbarItemGroup(placement: .bottomBar) {
-        Spacer()
-
-        Button {
-          addButtonTapped()
-        } label: {
-          Image(systemName: "plus")
-        }
-        .buttonStyle(.glassProminent)
-      }
-    }
+  func itemTapped(_ item: Item) {
+    destination = .itemForm(.init(item))
   }
 
   func deleteRows(groupDay: Date, at indexSet: IndexSet) {
@@ -155,7 +66,7 @@ public struct ChildDetailView: View {
           guard
             let group = groupedItems.first(where: { $0.key == groupDay })
           else { continue }
-          
+
           try Item
             .find(group.value[index].id)
             .delete()
@@ -164,11 +75,15 @@ public struct ChildDetailView: View {
       }
     }
   }
-  
+
   func addButtonTapped() {
     destination = .itemForm(Item.Draft(childID: child.id))
   }
-  
+
+  func reminderButtonTapped() {
+    reminderChild = child
+  }
+
   func shareButtonTapped() {
     Task { @MainActor in
       isPreparingSharedRecord = true
@@ -185,6 +100,119 @@ public struct ChildDetailView: View {
         }
       } catch {
         caughtError = error
+      }
+    }
+  }
+}
+
+public struct ChildDetailView: View {
+  @State private var model: ChildDetailModel
+
+  public init(child: Child) {
+    _model = State(initialValue: .init(child: child))
+  }
+
+  public init(model: ChildDetailModel) {
+    _model = State(initialValue: model)
+  }
+
+  public var body: some View {
+    @Bindable var model = model
+
+    List {
+      if let error = model.caughtError {
+        Text(error.localizedDescription)
+          .foregroundStyle(Color.white)
+          .listRowBackground(Color(uiColor: .systemRed))
+          .task(id: error.localizedDescription) {
+            try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 4)
+            withAnimation { model.caughtError = nil }
+          }
+      }
+      if let error = model.$items.loadError {
+        Text(error.localizedDescription)
+          .foregroundStyle(Color.white)
+          .listRowBackground(Color(uiColor: .systemRed))
+      }
+      if !model.groupedItems.isEmpty {
+        ForEach(model.groupedItems, id: \.key) { group in
+          Section(
+            header: Text(group.key.customFormatted())
+          ) {
+            ForEach(group.value) { item in
+              Button {
+                model.itemTapped(item)
+              } label: {
+                ItemRow(item: item)
+                  .buttonStyle(.borderless)
+              }
+            }
+            .onDelete { indexSet in
+              model.deleteRows(groupDay: group.key, at: indexSet)
+            }
+          }
+        }
+      } else if model.isLoading {
+        HStack(alignment: .center) {
+          ProgressView()
+            .progressViewStyle(.circular)
+
+          Text.init(.itemsLoading)
+        }
+        .frame(maxWidth: .infinity)
+      } else if model.isFiltering {
+        ContentUnavailableView.search(text: model.searchText.trimmedForSearch)
+      } else {
+        ContentUnavailableView(
+          .childDetailEmptyTitle(model.child.name),
+          systemImage: "figure.2.and.child.holdinghands",
+          description: Text(.childDetailEmptyDescription)
+        )
+      }
+    }
+    .sheet(item: $model.destination.itemForm, id: \.id) {
+      ItemFormSheet(itemDraft: $0)
+    }
+    .sheet(item: $model.sharedRecord) { CloudSharingView(sharedRecord: $0) }
+    .sheet(item: $model.reminderChild) { DailyReminderSheet(child: $0) }
+    .navigationTitle(model.child.name)
+    .searchable(
+      text: $model.searchText,
+      placement: .toolbar,
+      prompt: Text(.childDetailSearchPlaceholder)
+    )
+    .searchToolbarBehavior(.minimize)
+    .toolbar {
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        if model.syncEngine.isLoading || model.isPreparingSharedRecord {
+          ProgressView()
+            .progressViewStyle(.circular)
+        } else {
+          Button {
+            model.shareButtonTapped()
+          } label: {
+            Image(systemName: "square.and.arrow.up")
+          }
+        }
+
+        Button {
+          model.reminderButtonTapped()
+        } label: {
+          Image(systemName: "bell.badge")
+        }
+      }
+
+      DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
+
+      ToolbarItemGroup(placement: .bottomBar) {
+        Spacer()
+
+        Button {
+          model.addButtonTapped()
+        } label: {
+          Image(systemName: "plus")
+        }
+        .buttonStyle(.glassProminent)
       }
     }
   }
