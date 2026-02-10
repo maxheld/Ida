@@ -1,21 +1,21 @@
-import CloudKit
 import SQLiteData
 import SwiftUI
-import SwiftUINavigation
 
-public struct ChildListView: View {
+@MainActor
+@Observable
+public final class ChildListModel {
   @Selection struct Row: Identifiable {
     var id: UUID { child.id }
     let child: Child
     let isShared: Bool
   }
 
-  @FetchAll var rows: [Row]
+  @ObservationIgnored @FetchAll var rows: [Row]
 
-  @State var isNewChildAlertPresented = false
-  @State var newChildName = ""
+  var isNewChildAlertPresented = false
+  var newChildName = ""
 
-  @Dependency(\.defaultDatabase) var database
+  @ObservationIgnored @Dependency(\.defaultDatabase) var database
 
   public init() {
     _rows = FetchAll(
@@ -29,10 +29,48 @@ public struct ChildListView: View {
     )
   }
 
+  func addButtonTapped() {
+    newChildName = ""
+    isNewChildAlertPresented = true
+  }
+
+  func saveButtonTapped() {
+    withErrorReporting {
+      try database.write { db in
+        try Child
+          .upsert { Child.Draft(name: newChildName) }
+          .execute(db)
+      }
+    }
+  }
+
+  func deleteRows(at indexSet: IndexSet) {
+    withErrorReporting {
+      try database.write { db in
+        for index in indexSet {
+          try Child
+            .find(rows[index].child.id)
+            .delete()
+            .execute(db)
+        }
+      }
+    }
+  }
+}
+
+public struct ChildListView: View {
+  @State private var model: ChildListModel
+
+  public init(model: ChildListModel = .init()) {
+    _model = State(initialValue: model)
+  }
+
   public var body: some View {
+    @Bindable var model = model
+
     List {
-      if !rows.isEmpty {
-        ForEach(rows) { row in
+      if !model.rows.isEmpty {
+        ForEach(model.rows) { row in
           NavigationLink {
             ChildDetailView(child: row.child)
           } label: {
@@ -46,7 +84,7 @@ public struct ChildListView: View {
           }
         }
         .onDelete { indexSet in
-          deleteRows(at: indexSet)
+          model.deleteRows(at: indexSet)
         }
       } else {
         ContentUnavailableView(
@@ -62,42 +100,22 @@ public struct ChildListView: View {
         Spacer()
 
         Button {
-          newChildName = ""
-          isNewChildAlertPresented = true
+          model.addButtonTapped()
         } label: {
           Image(systemName: "plus")
         }
         .alert(
           .childListNewChildTitle,
-          isPresented: $isNewChildAlertPresented
+          isPresented: $model.isNewChildAlertPresented
         ) {
-          TextField(.childListNewChildNameLabel, text: $newChildName)
+          TextField(.childListNewChildNameLabel, text: $model.newChildName)
 
           Button(.save) {
-            withErrorReporting {
-              try database.write { db in
-                try Child
-                  .upsert { Child.Draft(name: newChildName) }
-                  .execute(db)
-              }
-            }
+            model.saveButtonTapped()
           }
-          .disabled(newChildName.isEmpty)
+          .disabled(model.newChildName.isEmpty)
 
           Button(.cancel, role: .cancel) { }
-        }
-      }
-    }
-  }
-
-  private func deleteRows(at indexSet: IndexSet) {
-    withErrorReporting {
-      try database.write { db in
-        for index in indexSet {
-          try Child
-            .find(rows[index].child.id)
-            .delete()
-            .execute(db)
         }
       }
     }
