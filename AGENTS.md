@@ -3,6 +3,7 @@
 ## Project Structure & Module Organization
 - `Ida/` contains the iOS app target shell (`IdaApp.swift`, `AppIntents.swift`, `Info.plist`, entitlements, app-level assets/strings).
 - `Modules/AppFeature/` contains the main feature module (views, SQLiteData schema/migrations, reminders, feature assets/strings).
+- Core feature files currently include `ChildList.swift`, `ChildDetail.swift`, and `ItemFormView.swift` (view + model extractions).
 - `Modules/AppFeatureTests/` contains unit tests for `AppFeature` using Swift Testing.
 - `Modules/Package.swift` defines the local Swift package (`AppFeature`, `AppFeatureTests`) used by the app target.
 - `Modules/AppFeature.xctestplan` defines the package test plan.
@@ -38,7 +39,7 @@ Release builds still use the shared scheme:
 - Swift and SwiftUI code in `Ida/` and `Modules/AppFeature/` uses 2-space indentation; follow existing formatting.
 - Tests follow existing formatting.
 - Types use PascalCase (e.g., `ChildDetailView`); properties and methods use camelCase.
-- File names typically match the primary type in the file (e.g., `ChildListView.swift`).
+- File names usually follow feature grouping and may contain both view and model types (e.g., `ChildList.swift`, `ChildDetail.swift`).
 - Add new feature UI strings to `Modules/AppFeature/Localizable.xcstrings`.
 - Add app-intent/app-shell strings to `Ida/Localizable.xcstrings`.
 
@@ -48,11 +49,16 @@ Release builds still use the shared scheme:
 - Name test files `*Tests.swift` and keep test methods small and focused.
 - Use deterministic dependencies in suites (`.dependency(\.context, .test)`, `.dependency(\.date.now, ...)`, `.dependency(\.uuid, .incrementing)`).
 
-## Refactor Learnings (ChildListModel)
-- `ChildListView` logic in `Modules/AppFeature/ChildListView.swift` is extracted into `@MainActor @Observable` `ChildListModel`; keep the view focused on rendering and user-event forwarding.
+## Refactor Learnings (Observable Models)
+- `ChildListView` logic in `Modules/AppFeature/ChildList.swift` is extracted into `ChildListModel`; keep the view focused on rendering and user-event forwarding.
+- `ChildDetailView` logic in `Modules/AppFeature/ChildDetail.swift` is extracted into `ChildDetailModel`; keep grouped/filter/search/delete/share/reminder behavior in the model and keep presentation wiring in the view.
+- `ItemFormView` logic in `Modules/AppFeature/ItemFormView.swift` is extracted into `ItemFormModel`; keep suggestion/emoji loading and item persistence in the model.
 - In `@Observable` models that use SQLiteData, annotate `@FetchAll`/`@FetchOne`/`@Fetch` and `@Dependency` properties with `@ObservationIgnored`.
-- Keep model injection explicit in views (`init(model: ChildListModel = .init())`) to support targeted unit tests.
+- Keep model injection explicit in views (`init(model: ...)`) plus convenience initializers (`init(child:)`, `init(item:)`) to support targeted unit tests and call-site ergonomics.
+- Keep view-only environment concerns (e.g. `dismiss`) in the view; model methods should handle domain behavior and persistence.
+- Trigger async model work from the view (`.task { await model... }`) rather than creating hidden task orchestration in the view body.
 - For model tests, use `@Suite` traits with deterministic dependencies (`.dependency(\.context, .test)`, `.dependency(\.date.now, ...)`, `.dependency(\.uuid, .incrementing)`) and bootstrap via `.dependencies { try $0.bootstrapDatabase(seedData: false) }`.
+- Mirror behavior tests at the model level (`ChildListModelTests`, `ChildDetailModelTests`, `ItemFormModelTests`) so refactors preserve UI behavior without needing UI tests.
 - Keep feature logic testable in the package test target (`@testable import AppFeature`).
 
 ## SQLiteData Testing Notes
@@ -85,4 +91,4 @@ Release builds still use the shared scheme:
 - Writes go through `database.write { db in ... }` which wraps changes in a transaction; use `DatabaseMigrator` + `#sql` for schema/migrations.
 - Optional CloudKit sync is configured by setting `defaultSyncEngine = SyncEngine(for:defaultDatabase, tables: ...)`.
 - SQLite knowledge (schema design, queries, indexes) is expected for effective use.
-- In this repo, see `Modules/AppFeature/Schema.swift` for migrations + sync setup and `Modules/AppFeature/ChildListView.swift` / `Modules/AppFeature/ItemFormView.swift` for fetch/write usage.
+- In this repo, see `Modules/AppFeature/Schema.swift` for migrations + sync setup and `Modules/AppFeature/ChildList.swift` / `Modules/AppFeature/ChildDetail.swift` / `Modules/AppFeature/ItemFormView.swift` for fetch/write usage.
