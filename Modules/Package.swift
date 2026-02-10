@@ -30,8 +30,7 @@ let package = Package(
       ],
       path: "AppFeature",
       resources: [
-        .process("Localizable.xcstrings"),
-        .process("Assets.xcassets")
+        .process("Resources")
       ],
       swiftSettings: [
         .defaultIsolation(MainActor.self)
