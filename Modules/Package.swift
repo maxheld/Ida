@@ -32,7 +32,10 @@ let package = Package(
       resources: [
         .process("Localizable.xcstrings"),
         .process("Assets.xcassets")
-      ]
+      ],
+      swiftSettings: [
+        .defaultIsolation(MainActor.self)
+      ],
     ),
     .testTarget(
       name: "AppFeatureTests",
@@ -40,7 +43,10 @@ let package = Package(
         "AppFeature",
         .product(name: "DependenciesTestSupport", package: "swift-dependencies")
       ],
-      path: "AppFeatureTests"
+      path: "AppFeatureTests",
+      swiftSettings: [
+        .defaultIsolation(MainActor.self)
+      ],
     )
   ]
 )

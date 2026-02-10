@@ -7,7 +7,6 @@ import Testing
 
 @testable import AppFeature
 
-@MainActor
 @Suite(
   .disabled("Right now these tests don't pass due to a bug in SQLiteData using live CloudKit APIs"),
   .serialized,

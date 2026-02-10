@@ -1,7 +1,6 @@
 import SQLiteData
 import SwiftUI
 
-@MainActor
 @Observable
 public final class ChildListModel {
   @Selection struct Row: Identifiable {

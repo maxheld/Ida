@@ -75,7 +75,6 @@ struct DailyReminderSheet: View {
     .task { await loadReminders() }
   }
 
-  @MainActor
   private func loadReminders() async {
     guard !isLoading else { return }
     isLoading = true
