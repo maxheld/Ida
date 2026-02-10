@@ -14,104 +14,40 @@ enum Field: Hashable {
   case description
 }
 
-struct ItemFormView: View {
-  @Dependency(\.defaultDatabase) private var database
-  @Environment(\.dismiss) private var dismiss
+@Observable
+final class ItemFormModel {
+  var item: Item.Draft
+  @ObservationIgnored @FetchAll(Suggestion.none) var suggestions: [Suggestion]
+  @ObservationIgnored @FetchAll(Suggestion.none) var emojiSuggestions: [Suggestion]
+  var frequentlyUsedEmojis: [String] = []
 
-  @State var item: Item.Draft
-  @FocusState private var focus: Field?
-  
-  @FetchAll(Suggestion.none) var suggestions: [Suggestion]
-  @FetchAll(Suggestion.none) var emojiSuggestions: [Suggestion]
-  @State var frequentlyUsedEmojis: [String] = []
-  
-  var body: some View {
-    Form {
-      Section {
-        DatePicker(
-          .itemFormDatepickerLabel,
-          selection: $item.date,
-          displayedComponents: [.date, .hourAndMinute]
-        )
-        .labelsHidden()
-        
-        TimeShortcuts(date: $item.date)
-      }
-      
-      Section {
-        TextField(.itemFormTextfieldLabel, text: $item.description)
-          .focused($focus, equals: .description)
-          .padding()
-          .onAppear { focus = .description }
-        
-        if !suggestions.isEmpty {
-          FlowLayout {
-            ForEach(suggestions) { suggestion in
-              Button(suggestion.description) {
-                item.description = suggestion.description
-              }
-              .multilineTextAlignment(.leading)
-              .lineLimit(nil)
-            }
-            .buttonStyle(.bordered)
-          }
-        }
-      }
-    }
-    .navigationBarTitleDisplayMode(.inline)
-    .toolbar {
-      ToolbarItem(placement: .primaryAction) {
-        Button {
-          saveButtonTapped()
-        } label: {
-          Image(systemName: "checkmark")
-        }
-        .buttonStyle(.glassProminent)
-        .disabled(item.description == "")
-      }
+  @ObservationIgnored @Dependency(\.defaultDatabase) private var database
 
-      ToolbarItemGroup(placement: .keyboard) {
-        if !frequentlyUsedEmojis.isEmpty {
-          ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-              ForEach(frequentlyUsedEmojis, id: \.self) { emoji in
-                Button(emoji) {
-                  if item.description != "" {
-                    item.description.append(" \(emoji)")
-                  } else {
-                    item.description = emoji
-                  }
-                }
-                .padding(.horizontal, 8)
-                .buttonStyle(.plain)
-              }
-            }
-          }
-        }
-      }
-
-      ToolbarItem(placement: .cancellationAction) {
-        Button {
-          dismiss()
-        } label: {
-          Image(systemName: "xmark")
-        }
-      }
-    }
-    .task(id: item.description) { await loadSuggestionsTask() }
-    .task { await loadEmojiSuggestionsTask() }
+  init(item: Item.Draft) {
+    self.item = item
   }
-  
-  private func saveButtonTapped() {
+
+  func saveButtonTapped() {
     withErrorReporting {
       try database.write { db in
         try Item.upsert { item }.execute(db)
       }
     }
-    dismiss()
   }
-  
-  private func loadSuggestionsTask() async {
+
+  func suggestionButtonTapped(_ suggestion: Suggestion) {
+    item.description = suggestion.description
+  }
+
+  func emojiButtonTapped(_ emoji: String) {
+    if item.description != "" {
+      item.description.append(" \(emoji)")
+    } else {
+      item.description = emoji
+    }
+  }
+
+  func loadSuggestionsTask() async {
     _ = await withErrorReporting {
       try await $suggestions.load(
         Item
@@ -130,8 +66,8 @@ struct ItemFormView: View {
       )
     }
   }
-  
-  private func loadEmojiSuggestionsTask() async {
+
+  func loadEmojiSuggestionsTask() async {
     _ = await withErrorReporting {
       try await $emojiSuggestions.load(
         Item
@@ -140,7 +76,98 @@ struct ItemFormView: View {
         animation: .default
       )
     }
-    self.frequentlyUsedEmojis = uniqueEmojisByFrequency(in: emojiSuggestions.map(\.description))
+    frequentlyUsedEmojis = uniqueEmojisByFrequency(in: emojiSuggestions.map(\.description))
+  }
+}
+
+struct ItemFormView: View {
+  @Environment(\.dismiss) private var dismiss
+  @State private var model: ItemFormModel
+
+  @FocusState private var focus: Field?
+
+  init(item: Item.Draft) {
+    _model = State(initialValue: .init(item: item))
+  }
+
+  init(model: ItemFormModel) {
+    _model = State(initialValue: model)
+  }
+  
+  var body: some View {
+    @Bindable var model = model
+
+    Form {
+      Section {
+        DatePicker(
+          .itemFormDatepickerLabel,
+          selection: $model.item.date,
+          displayedComponents: [.date, .hourAndMinute]
+        )
+        .labelsHidden()
+        
+        TimeShortcuts(date: $model.item.date)
+      }
+      
+      Section {
+        TextField(.itemFormTextfieldLabel, text: $model.item.description)
+          .focused($focus, equals: .description)
+          .padding()
+          .onAppear { focus = .description }
+        
+        if !model.suggestions.isEmpty {
+          FlowLayout {
+            ForEach(model.suggestions) { suggestion in
+              Button(suggestion.description) {
+                model.suggestionButtonTapped(suggestion)
+              }
+              .multilineTextAlignment(.leading)
+              .lineLimit(nil)
+            }
+            .buttonStyle(.bordered)
+          }
+        }
+      }
+    }
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .primaryAction) {
+        Button {
+          model.saveButtonTapped()
+          dismiss()
+        } label: {
+          Image(systemName: "checkmark")
+        }
+        .buttonStyle(.glassProminent)
+        .disabled(model.item.description == "")
+      }
+
+      ToolbarItemGroup(placement: .keyboard) {
+        if !model.frequentlyUsedEmojis.isEmpty {
+          ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+              ForEach(model.frequentlyUsedEmojis, id: \.self) { emoji in
+                Button(emoji) {
+                  model.emojiButtonTapped(emoji)
+                }
+                .padding(.horizontal, 8)
+                .buttonStyle(.plain)
+              }
+            }
+          }
+        }
+      }
+
+      ToolbarItem(placement: .cancellationAction) {
+        Button {
+          dismiss()
+        } label: {
+          Image(systemName: "xmark")
+        }
+      }
+    }
+    .task(id: model.item.description) { await model.loadSuggestionsTask() }
+    .task { await model.loadEmojiSuggestionsTask() }
   }
 }
 
