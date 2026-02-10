@@ -89,14 +89,16 @@ public final class ChildDetailModel {
       isPreparingSharedRecord = true
       defer { isPreparingSharedRecord = false }
       do {
-        sharedRecord = try await syncEngine.share(record: child) { share in
-          share[CKShare.SystemFieldKey.title] = String(
-            localized: "child.detail.share.title \(child.name)"
-          )
+        let title = String(
+          localized: "child.detail.share.title \(child.name)",
+          bundle: .module
+        )
+        let imageData = UIImage(named: "ShareAppIcon", in: .module, with: nil)?.pngData()
+
+        sharedRecord = try await syncEngine.share(record: child) { [title, imageData] share in
+          share[CKShare.SystemFieldKey.title] = title
           share.publicPermission = .readWrite
-          share[CKShare.SystemFieldKey.thumbnailImageData] = UIImage(
-            named: "ShareAppIcon"
-          )?.pngData()
+          share[CKShare.SystemFieldKey.thumbnailImageData] = imageData
         }
       } catch {
         caughtError = error
