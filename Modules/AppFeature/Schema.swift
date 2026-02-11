@@ -67,6 +67,23 @@ extension DependencyValues {
         }
       #endif
     }
+    migrator.registerMigration("Add item indexes") { db in
+      try #sql(
+        """
+        CREATE INDEX IF NOT EXISTS "items_childID_date_index"
+        ON "items" ("childID", "date" DESC)
+        """
+      )
+      .execute(db)
+
+      try #sql(
+        """
+        CREATE INDEX IF NOT EXISTS "items_childID_description_index"
+        ON "items" ("childID", "description")
+        """
+      )
+      .execute(db)
+    }
     try migrator.migrate(database)
     defaultDatabase = database
     defaultSyncEngine = try SyncEngine(
