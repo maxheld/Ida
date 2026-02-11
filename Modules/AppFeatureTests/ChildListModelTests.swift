@@ -8,13 +8,14 @@ import Testing
 @testable import AppFeature
 
 @Suite(
-  .disabled("Right now these tests don't pass due to a bug in SQLiteData using live CloudKit APIs"),
   .serialized,
-  .dependency(\.context, .test),
   .dependency(\.date.now, Date(timeIntervalSince1970: 1_234_567_890)),
   .dependency(\.uuid, .incrementing),
   .dependencies {
-    try $0.bootstrapDatabase(seedData: false)
+    try $0.bootstrapDatabase(
+      seedData: false,
+      containerIdentifierOverride: "test"
+    )
   }
 )
 struct ChildListModelTests {
@@ -41,18 +42,19 @@ struct ChildListModelTests {
   }
 
   @Test
-  func saveButtonTappedWithNonEmptyNameInsertsChild() throws {
+  func saveButtonTappedWithNonEmptyNameInsertsChild() async throws {
     let model = ChildListModel()
     model.newChildName = "Mila"
 
     model.saveButtonTapped()
 
-    let children = try database.read { db in
+    let children = try await database.read { db in
       try Child.order(by: \.name).fetchAll(db)
     }
     expectNoDifference(children.map(\.name), ["Mila"])
 
     let refreshed = ChildListModel()
+    try await refreshed.$rows.load()
     expectNoDifference(refreshed.rows.map(\.child.name), ["Mila"])
     expectNoDifference(refreshed.rows.map(\.isShared), [false])
   }

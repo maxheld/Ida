@@ -126,7 +126,6 @@ struct ReminderFormModelTests {
     let scheduledHour = await recorder.scheduledHour
     let scheduledMinute = await recorder.scheduledMinute
 
-
     expectNoDifference(result, true)
     expectNoDifference(scheduledID, "existing")
     expectNoDifference(scheduledChildID, child.id)

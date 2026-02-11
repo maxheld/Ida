@@ -17,10 +17,13 @@ public nonisolated struct Child: Identifiable, Hashable, Sendable {
 }
 
 extension DependencyValues {
-  public mutating func bootstrapDatabase(seedData: Bool = false) throws {
+  public mutating func bootstrapDatabase(
+    seedData: Bool = false,
+    containerIdentifierOverride: String? = nil
+  ) throws {
     var configuration = Configuration()
     configuration.prepareDatabase { db in
-      try db.attachMetadatabase()
+      try db.attachMetadatabase(containerIdentifier: containerIdentifierOverride)
     }
 
     let database = try SQLiteData.defaultDatabase(configuration: configuration)
@@ -69,7 +72,7 @@ extension DependencyValues {
     defaultSyncEngine = try SyncEngine(
       for: defaultDatabase,
       tables: Child.self, Item.self,
-      containerIdentifier: "iCloud.com.maxheld.IdaApp"
+      containerIdentifier: containerIdentifierOverride ?? "iCloud.com.maxheld.IdaApp"
     )
   }
 }
