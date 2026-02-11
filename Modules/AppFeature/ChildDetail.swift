@@ -20,6 +20,7 @@ public final class ChildDetailModel {
   var isPreparingSharedRecord = false
   var reminderChild: Child?
   var searchText = ""
+  @ObservationIgnored private var normalizedDescriptionCache: [Item.ID: (source: String, normalized: String)] = [:]
 
   @ObservationIgnored @Dependency(\.defaultSyncEngine) var syncEngine
   @ObservationIgnored @Dependency(\.defaultDatabase) var database
@@ -27,7 +28,15 @@ public final class ChildDetailModel {
   var filteredItems: [Item] {
     let trimmedSearch = searchText.trimmedForSearch
     guard !trimmedSearch.isEmpty else { return items }
-    return items.filter { $0.description.fuzzyMatches(trimmedSearch) }
+    let tokens = trimmedSearch.normalizedSearchTokens
+    guard !tokens.isEmpty else { return items }
+
+    return items.filter {
+      normalizedTextMatchesSearchTokens(
+        normalizedDescription(for: $0),
+        tokens: tokens
+      )
+    }
   }
 
   var groupedItems: [(key: Date, value: [Item])] {
@@ -60,15 +69,18 @@ public final class ChildDetailModel {
   }
 
   func deleteRows(groupDay: Date, at indexSet: IndexSet) {
+    guard let group = groupedItems.first(where: { $0.key == groupDay }) else { return }
+    let itemIDs: [Item.ID] = indexSet.compactMap { index in
+      guard group.value.indices.contains(index) else { return nil }
+      return group.value[index].id
+    }
+    guard !itemIDs.isEmpty else { return }
+
     withErrorReporting {
       try database.write { db in
-        for index in indexSet {
-          guard
-            let group = groupedItems.first(where: { $0.key == groupDay })
-          else { continue }
-
+        for itemID in itemIDs {
           try Item
-            .find(group.value[index].id)
+            .find(itemID)
             .delete()
             .execute(db)
         }
@@ -105,6 +117,37 @@ public final class ChildDetailModel {
       }
     }
   }
+
+  private func normalizedDescription(for item: Item) -> String {
+    if
+      let cached = normalizedDescriptionCache[item.id],
+      cached.source == item.description
+    {
+      return cached.normalized
+    }
+    let normalized = item.description.normalizedForSearch
+    normalizedDescriptionCache[item.id] = (source: item.description, normalized: normalized)
+    return normalized
+  }
+
+  private func normalizedTextMatchesSearchTokens(
+    _ normalizedText: String,
+    tokens: [Substring]
+  ) -> Bool {
+    tokens.allSatisfy { token in
+      if normalizedText.contains(token) { return true }
+
+      var tokenIndex = token.startIndex
+      for character in normalizedText {
+        if character == token[tokenIndex] {
+          tokenIndex = token.index(after: tokenIndex)
+          if tokenIndex == token.endIndex { return true }
+        }
+      }
+
+      return false
+    }
+  }
 }
 
 public struct ChildDetailView: View {
@@ -120,6 +163,7 @@ public struct ChildDetailView: View {
 
   public var body: some View {
     @Bindable var model = model
+    let groupedItems = model.groupedItems
 
     List {
       if let error = model.caughtError {
@@ -136,8 +180,8 @@ public struct ChildDetailView: View {
           .foregroundStyle(Color.white)
           .listRowBackground(Color(uiColor: .systemRed))
       }
-      if !model.groupedItems.isEmpty {
-        ForEach(model.groupedItems, id: \.key) { group in
+      if !groupedItems.isEmpty {
+        ForEach(groupedItems, id: \.key) { group in
           Section(
             header: Text(group.key.customFormatted())
           ) {
@@ -253,29 +297,12 @@ private extension String {
   var trimmedForSearch: String {
     trimmingCharacters(in: .whitespacesAndNewlines)
   }
-  
-  func fuzzyMatches(_ query: String) -> Bool {
-    let normalizedQuery = query.normalizedForSearch
-    guard !normalizedQuery.isEmpty else { return true }
-    let normalizedText = normalizedForSearch
-    
-    return normalizedQuery
-      .split(whereSeparator: \.isWhitespace)
-      .allSatisfy { token in
-        let tokenString = String(token)
-        if normalizedText.contains(tokenString) { return true }
-        var tokenIndex = tokenString.startIndex
-        for character in normalizedText {
-          if character == tokenString[tokenIndex] {
-            tokenIndex = tokenString.index(after: tokenIndex)
-            if tokenIndex == tokenString.endIndex { return true }
-          }
-        }
-        return false
-      }
+
+  var normalizedSearchTokens: [Substring] {
+    normalizedForSearch.split(whereSeparator: \.isWhitespace)
   }
-  
-  private var normalizedForSearch: String {
+
+  var normalizedForSearch: String {
     folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
   }
 }

@@ -16,6 +16,10 @@ enum Field: Hashable {
 
 @Observable
 final class ItemFormModel {
+  static let suggestionsLimit = 12
+  static let emojiHistoryLimit = 250
+  static let emojiDisplayLimit = 16
+
   var item: Item.Draft
   @ObservationIgnored @FetchAll(Suggestion.none) var suggestions: [Suggestion]
   @ObservationIgnored @FetchAll(Suggestion.none) var emojiSuggestions: [Suggestion]
@@ -48,19 +52,36 @@ final class ItemFormModel {
   }
 
   func loadSuggestionsTask() async {
+    await loadSuggestionsTask(searchText: item.description)
+  }
+
+  func loadSuggestionsDebouncedTask(for searchText: String) async {
+    do {
+      try await Task.sleep(nanoseconds: 250_000_000)
+    } catch {
+      return
+    }
+    guard !Task.isCancelled else { return }
+    await loadSuggestionsTask(searchText: searchText)
+  }
+
+  private func loadSuggestionsTask(searchText: String) async {
+    let trimmedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+
     _ = await withErrorReporting {
       try await $suggestions.load(
         Item
           .where { $0.childID.eq(item.childID) }
           .where {
-            if item.description != "" {
-              $0.description.contains(item.description)
+            if !trimmedSearch.isEmpty {
+              $0.description.contains(trimmedSearch)
             } else {
               true
             }
           }
           .order { $0.date.desc() }
           .distinct()
+          .limit(Self.suggestionsLimit)
           .select { Suggestion.Columns(description: $0.description) },
         animation: .default
       )
@@ -72,11 +93,16 @@ final class ItemFormModel {
       try await $emojiSuggestions.load(
         Item
           .where { $0.childID.eq(item.childID) }
+          .order { $0.date.desc() }
+          .limit(Self.emojiHistoryLimit)
           .select { Suggestion.Columns(description: $0.description) },
         animation: .default
       )
     }
-    frequentlyUsedEmojis = uniqueEmojisByFrequency(in: emojiSuggestions.map(\.description))
+    frequentlyUsedEmojis = Array(
+      uniqueEmojisByFrequency(in: emojiSuggestions.map(\.description))
+        .prefix(Self.emojiDisplayLimit)
+    )
   }
 }
 
@@ -166,7 +192,9 @@ struct ItemFormView: View {
         }
       }
     }
-    .task(id: model.item.description) { await model.loadSuggestionsTask() }
+    .task(id: model.item.description) {
+      await model.loadSuggestionsDebouncedTask(for: model.item.description)
+    }
     .task { await model.loadEmojiSuggestionsTask() }
   }
 }

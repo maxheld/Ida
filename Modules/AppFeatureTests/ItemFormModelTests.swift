@@ -109,6 +109,28 @@ struct ItemFormModelTests {
   }
 
   @Test
+  func loadSuggestionsTaskLimitsResults() async throws {
+    try insertChild(child)
+    try insertItems(
+      (0..<20).map { index in
+        Item(
+          id: UUID(100 + index),
+          childID: child.id,
+          date: Date(timeIntervalSince1970: 1_700_200_000 - Double(index)),
+          description: "Milk \(index)"
+        )
+      }
+    )
+    let model = ItemFormModel(item: .init(childID: child.id, description: "Milk"))
+
+    await model.loadSuggestionsTask()
+
+    expectNoDifference(model.suggestions.count, ItemFormModel.suggestionsLimit)
+    expectNoDifference(model.suggestions.first?.description, "Milk 0")
+    expectNoDifference(model.suggestions.last?.description, "Milk 11")
+  }
+
+  @Test
   func loadEmojiSuggestionsTaskCalculatesFrequency() async throws {
     try insertChild(child)
     try insertItems([
@@ -130,6 +152,35 @@ struct ItemFormModelTests {
     await model.loadEmojiSuggestionsTask()
 
     expectNoDifference(model.frequentlyUsedEmojis, ["😄", "🍎"])
+  }
+
+  @Test
+  func loadEmojiSuggestionsTaskLimitsDisplayedEmojis() async throws {
+    let emojis = [
+      "😀", "😁", "😂", "😃", "😄",
+      "😅", "😆", "😉", "😊", "😋",
+      "😎", "😍", "😘", "😗", "😙",
+      "😚", "😇", "🙂", "🙃", "😌",
+    ]
+
+    try insertChild(child)
+    try insertItems([
+      Item(
+        id: UUID(300),
+        childID: child.id,
+        date: Date(timeIntervalSince1970: 1_700_300_000),
+        description: emojis.joined()
+      )
+    ])
+    let model = ItemFormModel(item: .init(childID: child.id))
+
+    await model.loadEmojiSuggestionsTask()
+
+    expectNoDifference(model.frequentlyUsedEmojis.count, ItemFormModel.emojiDisplayLimit)
+    expectNoDifference(
+      model.frequentlyUsedEmojis,
+      Array(emojis.prefix(ItemFormModel.emojiDisplayLimit))
+    )
   }
 
   private func insertChild(_ child: Child) throws {
