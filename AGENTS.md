@@ -37,13 +37,27 @@ Release builds still use the shared scheme:
 
 ## Swift LSP Code Reading
 - Use `tools/sourcekit-lsp-query.sh` for semantic Swift inspection (symbols/hover/definition) before relying on plain text-only reads.
-- Run LSP queries from repo root and set workspace to `.`:
+- Run all LSP queries from repo root and set workspace to `.` so paths resolve consistently.
+- If `sourcekit-lsp` closes unexpectedly in sandboxed execution, rerun the same command outside sandbox/escalated mode.
+- Single-file usage:
   - `tools/sourcekit-lsp-query.sh --workspace . symbols Modules/AppFeature/ChildList.swift`
   - `tools/sourcekit-lsp-query.sh --workspace . hover Modules/AppFeature/ChildList.swift 31 8`
   - `tools/sourcekit-lsp-query.sh --workspace . definition Modules/AppFeature/ChildList.swift 31 8`
-- To semantically read every Swift file in the repo, run:
-  - `rg --files -g '*.swift' | while read -r file; do tools/sourcekit-lsp-query.sh --workspace . symbols "$file" >/dev/null || echo "LSP failed: $file"; done`
-- If a query fails for a file, keep going with remaining files, then inspect failures with targeted follow-up queries.
+- Batch mode (one long-lived LSP session for many files):
+  - `tools/sourcekit-lsp-query.sh --workspace . symbols Modules/AppFeature/ChildList.swift Modules/AppFeature/ChildDetail.swift Modules/AppFeature/ItemFormView.swift`
+  - `rg --files -g '*.swift' | xargs tools/sourcekit-lsp-query.sh --workspace . symbols`
+- Persistent cache reuse (faster repeated runs):
+  - Defaults already persist to `.lsp/scratch` and `.lsp/generated`.
+  - Optional override: `tools/sourcekit-lsp-query.sh --workspace . --scratch-path .lsp/custom-scratch --generated-files-path .lsp/custom-generated symbols Modules/AppFeature/ChildList.swift`
+- Incremental mode (changed Swift files only):
+  - `tools/sourcekit-lsp-query.sh --workspace . --changed-only symbols`
+  - `tools/sourcekit-lsp-query.sh --workspace . --changed-only --base-ref origin/main symbols`
+- JSONL output for large/batch runs:
+  - `tools/sourcekit-lsp-query.sh --workspace . --jsonl symbols Modules/AppFeature/ChildList.swift Modules/AppFeature/ChildDetail.swift`
+  - `tools/sourcekit-lsp-query.sh --workspace . --jsonl-path .lsp/sourcekit-results.jsonl --changed-only symbols`
+- Module-based parallelism (2-4 workers, long-lived LSP per worker):
+  - `tools/sourcekit-lsp-query.sh --workspace . --workers 3 symbols Ida/IdaApp.swift Modules/AppFeature/ChildList.swift Modules/AppFeatureTests/ChildListModelTests.swift`
+  - For repo-wide scans, prefer `--workers 2`, `--workers 3`, or `--workers 4` based on machine load.
 
 ## Coding Style & Naming Conventions
 - Swift and SwiftUI code in `Ida/` and `Modules/AppFeature/` uses 2-space indentation; follow existing formatting.

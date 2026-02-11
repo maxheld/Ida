@@ -8,3 +8,4 @@
 Ida.xcworkspace/xcuserdata/
 Ida.xcworkspace/xcuserdata/**
 **/.build/**
+.lsp/**
