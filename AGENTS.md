@@ -35,6 +35,16 @@ Always use XcodeBuildMCP for local builds on the iPhone 17 simulator.
 Release builds still use the shared scheme:
 - `xcodebuild -scheme "Ida - Release" -configuration Release build`
 
+## Swift LSP Code Reading
+- Use `tools/sourcekit-lsp-query.sh` for semantic Swift inspection (symbols/hover/definition) before relying on plain text-only reads.
+- Run LSP queries from repo root and set workspace to `.`:
+  - `tools/sourcekit-lsp-query.sh --workspace . symbols Modules/AppFeature/ChildList.swift`
+  - `tools/sourcekit-lsp-query.sh --workspace . hover Modules/AppFeature/ChildList.swift 31 8`
+  - `tools/sourcekit-lsp-query.sh --workspace . definition Modules/AppFeature/ChildList.swift 31 8`
+- To semantically read every Swift file in the repo, run:
+  - `rg --files -g '*.swift' | while read -r file; do tools/sourcekit-lsp-query.sh --workspace . symbols "$file" >/dev/null || echo "LSP failed: $file"; done`
+- If a query fails for a file, keep going with remaining files, then inspect failures with targeted follow-up queries.
+
 ## Coding Style & Naming Conventions
 - Swift and SwiftUI code in `Ida/` and `Modules/AppFeature/` uses 2-space indentation; follow existing formatting.
 - Tests follow existing formatting.
