@@ -66,8 +66,10 @@ Release builds still use the shared scheme:
 - File names usually follow feature grouping and may contain both view and model types (e.g., `ChildList.swift`, `ChildDetail.swift`).
 - Add new feature UI strings to `Modules/AppFeature/Localizable.xcstrings`.
 - Add app-intent/app-shell strings to `Ida/Localizable.xcstrings`.
+- In non-main targets (for example `Modules/AppFeature`), always pass `bundle: .module` to `String(localized:)`.
 
 ## Testing Guidelines
+- Any new functionality must include exhaustive unit tests that prove the intended behavior, including edge cases and failure paths.
 - Unit tests in `Modules/AppFeatureTests/` use Swift Testing (`import Testing`).
 - There is currently no UI test target in this repo; add one if UI coverage is needed.
 - Name test files `*Tests.swift` and keep test methods small and focused.

@@ -24,7 +24,7 @@ final class ReminderSheetModel {
   }
 
   func deleteReminders(at offsets: IndexSet) async {
-    let identifiers = offsets.map { reminders[$0].id }
+    let identifiers = offsets.flatMap { reminders[$0].requestIDs }
     await reminderClient.deleteReminders(identifiers)
     await loadRemindersTask()
   }
@@ -63,15 +63,17 @@ struct ReminderSheet: View {
                   Image(systemName: "circle")
                     .foregroundStyle(.secondary)
 
-                  Text(reminder.timeText)
-                    .font(.body)
-                    .foregroundStyle(.primary)
+                  VStack(alignment: .leading, spacing: 2) {
+                    Text(reminder.timeText)
+                      .font(.body)
+                      .foregroundStyle(.primary)
 
-                  Text(reminder.description)
-                    .font(.body)
-                    .multilineTextAlignment(.leading)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(4)
+                    Text(reminder.listSubtitle)
+                      .font(.body)
+                      .multilineTextAlignment(.leading)
+                      .foregroundStyle(.secondary)
+                      .lineLimit(4)
+                  }
                 }
               }
             }

@@ -59,7 +59,7 @@ struct ReminderSheetModelTests {
         },
         authorizationStatus: { .authorized },
         requestAuthorization: { true },
-        scheduleReminder: { _, _, _, _, _ in },
+        scheduleReminder: Self.noopScheduleReminder,
         deleteReminders: { _ in }
       )
     }
@@ -113,7 +113,7 @@ struct ReminderSheetModelTests {
         },
         authorizationStatus: { .authorized },
         requestAuthorization: { true },
-        scheduleReminder: { _, _, _, _, _ in },
+        scheduleReminder: Self.noopScheduleReminder,
         deleteReminders: { await recorder.setDeletedIdentifiers($0) }
       )
     } operation: {
@@ -130,4 +130,56 @@ struct ReminderSheetModelTests {
     expectNoDifference(loadCount, 2)
     expectNoDifference(model.reminders.map(\.id), ["evening"])
   }
+
+  @Test
+  func deleteRemindersForWeeklySeriesDeletesAllRequestIdentifiers() async {
+    let recorder = Recorder()
+    let model = withDependencies {
+      $0.reminderClient = ReminderClient(
+        loadReminders: { _ in
+          if await recorder.nextLoadCount() == 1 {
+            return [
+              ScheduledReminder(
+                id: "series",
+                requestIDs: ["series#1", "series#4"],
+                timeText: "9:05 AM",
+                description: "Sunday and Wednesday medicine",
+                sortKey: 9 * 60 + 5,
+                hour: 9,
+                minute: 5,
+                recurrence: .weekly,
+                weekdays: [1, 4]
+              )
+            ]
+          } else {
+            return []
+          }
+        },
+        authorizationStatus: { .authorized },
+        requestAuthorization: { true },
+        scheduleReminder: Self.noopScheduleReminder,
+        deleteReminders: { await recorder.setDeletedIdentifiers($0.sorted()) }
+      )
+    } operation: {
+      ReminderSheetModel(child: child)
+    }
+
+    await model.loadRemindersTask()
+    await model.deleteReminders(at: IndexSet(integer: 0))
+
+    let deletedIdentifiers = await recorder.deletedIdentifiers
+    let loadCount = await recorder.loadCount
+
+    expectNoDifference(deletedIdentifiers, ["series#1", "series#4"])
+    expectNoDifference(loadCount, 2)
+    expectNoDifference(model.reminders, [])
+  }
+
+  private static func noopScheduleReminder(
+    _ id: String?,
+    _ child: Child,
+    _ description: String,
+    _ hour: Int,
+    _ minute: Int
+  ) async throws {}
 }

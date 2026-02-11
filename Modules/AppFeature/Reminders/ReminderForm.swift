@@ -8,6 +8,15 @@ final class ReminderFormModel {
 
   var time = Date()
   var description = ""
+  var recurrence: ReminderRecurrence = .daily {
+    didSet {
+      guard recurrence == .weekly else { return }
+      if selectedWeekdays.isEmpty {
+        selectedWeekdays = [Calendar.current.component(.weekday, from: Date())]
+      }
+    }
+  }
+  var selectedWeekdays: Set<Int> = []
   var isSaving = false
   var errorMessage: String?
 
@@ -18,6 +27,11 @@ final class ReminderFormModel {
     self.reminder = reminder
     if let reminder {
       description = reminder.description
+      recurrence = reminder.recurrence
+      selectedWeekdays = reminder.weekdays
+      if recurrence == .weekly && selectedWeekdays.isEmpty {
+        selectedWeekdays = [Calendar.current.component(.weekday, from: Date())]
+      }
       let calendar = Calendar.current
       let initialDate = calendar.date(
         bySettingHour: reminder.hour,
@@ -34,6 +48,7 @@ final class ReminderFormModel {
   var isSaveDisabled: Bool {
     isSaving
       || description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+      || (recurrence == .weekly && selectedWeekdays.isEmpty)
   }
 
   func saveButtonTapped() async -> Bool {
@@ -54,26 +69,43 @@ final class ReminderFormModel {
     errorMessage = nil
   }
 
+  func setWeekday(_ weekday: Int, isSelected: Bool) {
+    guard (1...7).contains(weekday) else { return }
+    if isSelected {
+      selectedWeekdays.insert(weekday)
+    } else {
+      selectedWeekdays.remove(weekday)
+    }
+  }
+
   private func scheduleReminder() async throws {
     switch await reminderClient.authorizationStatus() {
     case .notDetermined:
       let granted = try await reminderClient.requestAuthorization()
       if !granted {
-        throw ReminderError.notificationsDenied
+        let message = await MainActor.run {
+          String(localized: "reminder.error.notificationsDenied", bundle: .module)
+        }
+        throw ReminderError.notificationsDenied(message)
       }
     case .denied:
-      throw ReminderError.notificationsDenied
+      let message = await MainActor.run {
+        String(localized: "reminder.error.notificationsDenied", bundle: .module)
+      }
+      throw ReminderError.notificationsDenied(message)
     case .authorized:
       break
     }
 
     let timeComponents = Calendar.current.dateComponents([.hour, .minute], from: time)
-    try await reminderClient.scheduleReminder(
+    try await reminderClient.schedule(
       reminder?.id,
       child,
       description,
       timeComponents.hour ?? 0,
-      timeComponents.minute ?? 0
+      timeComponents.minute ?? 0,
+      recurrence,
+      selectedWeekdays
     )
   }
 }
@@ -105,6 +137,29 @@ struct ReminderFormView: View {
     @Bindable var model = model
 
     Form {
+      Section {
+        Picker(.reminderRepeatLabel, selection: $model.recurrence) {
+          ForEach(ReminderRecurrence.allCases, id: \.self) { recurrence in
+            Text(recurrence.title)
+              .tag(recurrence)
+          }
+        }
+        .pickerStyle(.segmented)
+
+        if model.recurrence == .weekly {
+          ForEach(ReminderWeekday.orderedWeekdays()) { weekday in
+            Toggle(
+              weekday.title,
+              isOn: Binding(
+                get: { model.selectedWeekdays.contains(weekday.rawValue) },
+                set: { model.setWeekday(weekday.rawValue, isSelected: $0) }
+              )
+            )
+            .tint(Color.accentColor)
+          }
+        }
+      }
+
       Section {
         DatePicker(
           .reminderTimeLabel,
@@ -140,7 +195,7 @@ struct ReminderFormView: View {
       }
     }
     .alert(
-      String(localized: "reminder.error.title"),
+      String(localized: "reminder.error.title", bundle: .module),
       isPresented: Binding(
         get: { model.errorMessage != nil },
         set: { if !$0 { model.alertDismissed() } }
@@ -154,12 +209,12 @@ struct ReminderFormView: View {
 }
 
 private enum ReminderError: LocalizedError {
-  case notificationsDenied
+  case notificationsDenied(String)
 
   var errorDescription: String? {
     switch self {
-    case .notificationsDenied:
-      return String(localized: "reminder.error.notificationsDenied")
+    case let .notificationsDenied(message):
+      return message
     }
   }
 }

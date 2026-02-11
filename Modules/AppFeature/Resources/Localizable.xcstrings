@@ -333,13 +333,13 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Füge eine Erinnerung hinzu, um täglich an einen Eintrag erinnert zu werden."
+            "value": "Füge eine Erinnerung hinzu, um regelmäßig an einen Eintrag erinnert zu werden."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Add a reminder to get a daily prompt to log an entry."
+            "value": "Add a reminder to get a scheduled prompt to log an entry."
           }
         }
       }
@@ -412,19 +412,70 @@
         }
       }
     },
+    "reminder.recurrence.daily": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Täglich"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily"
+          }
+        }
+      }
+    },
+    "reminder.recurrence.weekly": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wöchentlich"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekly"
+          }
+        }
+      }
+    },
+    "reminder.repeat.label": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wiederholen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repeat"
+          }
+        }
+      }
+    },
     "reminder.sheet.title": {
       "extractionState": "manual",
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tägliche Erinnerungen"
+            "value": "Erinnerungen"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Daily Reminders"
+            "value": "Reminders"
           }
         }
       }
