@@ -1,5 +1,5 @@
 {
-  "originHash" : "2d2467c55b740025461f0608951a77d4a0a67c2f6b6e5ddf82366ef5b7e8d5b7",
+  "originHash" : "a55a115916a0d5b81ae345d4d9e79311ac88588865f26e67d55d202f90e9a06c",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/sqlite-data",
       "state" : {
-        "branch" : "79fbef8",
-        "revision" : "79fbef8a3a18004fb5138f679d926e0e348547b6"
+        "revision" : "5de18896e7a0358084bb4e3c83f7227500ba029b",
+        "version" : "1.5.2"
       }
     },
     {
