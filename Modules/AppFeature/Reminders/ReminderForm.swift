@@ -138,6 +138,17 @@ struct ReminderFormView: View {
 
     Form {
       Section {
+        DatePicker(
+          .reminderTimeLabel,
+          selection: $model.time,
+          displayedComponents: [.hourAndMinute]
+        )
+
+        TextField(.reminderDescriptionPlaceholder, text: $model.description)
+          .textInputAutocapitalization(.sentences)
+      }
+
+      Section {
         Picker(.reminderRepeatLabel, selection: $model.recurrence) {
           ForEach(ReminderRecurrence.allCases, id: \.self) { recurrence in
             Text(recurrence.title)
@@ -158,17 +169,6 @@ struct ReminderFormView: View {
             .tint(Color.accentColor)
           }
         }
-      }
-
-      Section {
-        DatePicker(
-          .reminderTimeLabel,
-          selection: $model.time,
-          displayedComponents: [.hourAndMinute]
-        )
-
-        TextField(.reminderDescriptionPlaceholder, text: $model.description)
-          .textInputAutocapitalization(.sentences)
       }
     }
     .navigationTitle(model.reminder == nil ? .reminderAddTitle : .reminderEditTitle)

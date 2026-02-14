@@ -64,11 +64,11 @@ struct ReminderSheet: View {
                     .foregroundStyle(.secondary)
 
                   VStack(alignment: .leading, spacing: 2) {
-                    Text(reminder.timeText)
+                    Text("\(reminder.timeText) • \(reminder.recurrenceText)")
                       .font(.body)
                       .foregroundStyle(.primary)
 
-                    Text(reminder.listSubtitle)
+                    Text(reminder.description)
                       .font(.body)
                       .multilineTextAlignment(.leading)
                       .foregroundStyle(.secondary)

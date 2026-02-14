@@ -32,6 +32,13 @@ nonisolated struct ReminderWeekday: Identifiable, Hashable, Sendable {
     return symbols[index]
   }
 
+  var shortTitle: String {
+    let symbols = Calendar.current.shortWeekdaySymbols
+    let index = rawValue - 1
+    guard symbols.indices.contains(index) else { return "" }
+    return symbols[index]
+  }
+
   static func orderedWeekdays(
     calendar: Calendar = .current
   ) -> [ReminderWeekday] {
@@ -63,19 +70,15 @@ nonisolated struct ScheduledReminder: Identifiable, Sendable, Equatable {
       let selectedDays = ReminderWeekday
         .orderedWeekdays()
         .filter { weekdays.contains($0.rawValue) }
-        .map(\.title)
+        .map(\.shortTitle)
       if selectedDays.isEmpty {
         return ReminderRecurrence.weekly.title
       }
+      if selectedDays.count == 7 {
+        return ReminderRecurrence.daily.title
+      }
       return selectedDays.joined(separator: ", ")
     }
-  }
-
-  @MainActor
-  var listSubtitle: String {
-    guard recurrence == .weekly else { return description }
-    if description.isEmpty { return recurrenceText }
-    return "\(recurrenceText) • \(description)"
   }
 
   init(
