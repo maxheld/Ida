@@ -98,14 +98,9 @@ struct LogActivityIntent: AppIntent {
       throw LogActivityIntentError.missingDescription
     }
 
-    let childName = child.name.trimmingCharacters(in: .whitespacesAndNewlines)
-    
-    guard !childName.isEmpty else { throw LogActivityIntentError.childNotFound }
-    
     let childID = try await database.read { db in
       try Child
-        .where { $0.name == childName }
-        .order(by: \.id)
+        .where { $0.id == child.id }
         .fetchAll(db)
         .first?
         .id

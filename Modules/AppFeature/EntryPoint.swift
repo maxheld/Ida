@@ -12,6 +12,8 @@ public struct EntryPoint: View {
   }
 
   @State var path: [Path] = []
+  @State private var didApplyInitialPath = false
+  @FetchAll var children: [Child]
 
   public init() {}
 
@@ -25,14 +27,23 @@ public struct EntryPoint: View {
           }
         }
     }
-    .task { await task() }
+    .onChange(of: children, initial: true) { _, _ in
+      applyInitialPathIfNeeded()
+    }
   }
 
-  private func task() async {
-    @FetchAll var children: [Child]
+  @MainActor
+  private func applyInitialPathIfNeeded() {
+    guard !didApplyInitialPath else { return }
 
-    if children.count == 1, let child = children.first {
-      path.append(.childDetail(child))
-    }
+    didApplyInitialPath = true
+
+    guard
+      path.isEmpty,
+      children.count == 1,
+      let child = children.first
+    else { return }
+
+    path = [.childDetail(child)]
   }
 }
