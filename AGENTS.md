@@ -35,6 +35,13 @@ Always use XcodeBuildMCP for local builds on the iPhone 17 simulator.
 Release builds still use the shared scheme:
 - `xcodebuild -scheme "Ida - Release" -configuration Release build`
 
+## Acknowledgements Maintenance
+- `ACKNOWLEDGEMENTS.md` is a symlink to `Modules/AppFeature/Resources/ACKNOWLEDGEMENTS.md`.
+- Generate acknowledgements with `tools/generate-third-party-acknowledgements.sh`; by default it writes `Modules/AppFeature/Resources/ACKNOWLEDGEMENTS.md` (accepts an optional explicit output path argument).
+- Regenerate acknowledgements whenever `Modules/Package.resolved` `originHash` changes.
+- Keep this tracked value updated whenever acknowledgements are regenerated (the generator updates this line automatically):
+  - Last acknowledged `originHash`: `a55a115916a0d5b81ae345d4d9e79311ac88588865f26e67d55d202f90e9a06c`
+
 ## Swift LSP Code Reading
 - Use `tools/sourcekit-lsp-query.sh` for semantic Swift inspection (symbols/hover/definition) before relying on plain text-only reads.
 - Run all LSP queries from repo root and set workspace to `.` so paths resolve consistently.
