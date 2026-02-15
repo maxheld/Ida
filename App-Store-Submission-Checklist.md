@@ -1,73 +1,44 @@
-# Indie App Store Submission Checklist (Ida)
+# App Store Connect Submission Checklist (Ida)
 
 _Last updated: February 15, 2026_
 
-Not legal advice. This is a practical pre-submission checklist tailored to this codebase.
+Use this as a release blocker checklist for required fields and legal/compliance declarations.
 
-## Current Status (Tailored to Ida)
+## 1) Required App Store Connect Fields
 
-1. `[Done]` Privacy manifest in app bundle
-- Present at `/Users/maximilianheld/Developer/Ida/Ida/PrivacyInfo.xcprivacy`.
-- Includes Required Reason APIs for:
-- `NSPrivacyAccessedAPICategoryFileTimestamp` with reason `C617.1`
-- `NSPrivacyAccessedAPICategoryUserDefaults` with reason `C56D.1`
+- [ ] App name, subtitle, primary category, and content rights are complete and final.
+- [ ] Support URL is live and reachable.
+- [ ] Privacy Policy URL is live and reachable.
+- [ ] Screenshots are current and represent actual app behavior.
+- [ ] "What’s New" text matches shipped changes.
+- [ ] Build selected for the version is the intended release build.
 
-2. `[Done]` Basic Info.plist compliance
-- `CFBundleDisplayName` exists in `/Users/maximilianheld/Developer/Ida/Ida/Info.plist`.
-- `ITSAppUsesNonExemptEncryption = false` is set.
+## 2) App Privacy + Data Disclosure
 
-3. `[Action]` Privacy policy (required even for free apps)
-- Add a public Privacy Policy URL in App Store Connect.
-- Add an in-app privacy policy link (easy to find in Settings/About/Help).
+- [ ] App Privacy questionnaire is completed using `/Users/maximilianheld/Developer/Ida/Data-Inventory-and-App-Privacy-Mapping.md`.
+- [ ] Tracking is set correctly (current app manifest shows `NSPrivacyTracking = false` in `/Users/maximilianheld/Developer/Ida/Ida/PrivacyInfo.xcprivacy`).
+- [ ] Required Reason APIs remain accurate:
+  - `NSPrivacyAccessedAPICategoryFileTimestamp` -> `C617.1`
+  - `NSPrivacyAccessedAPICategoryUserDefaults` -> `C56D.1`
+- [ ] If data behavior changed since last release, privacy answers were re-reviewed.
 
-4. `[Action]` App Privacy answers in App Store Connect
-- Do not assume "Data Not Collected" by default.
-- The app uses CloudKit and stores child names/entries (`/Users/maximilianheld/Developer/Ida/Modules/AppFeature/Schema.swift`), so disclosure must be accurate per Apple definitions.
-- A mismatch between actual behavior and App Privacy answers is a high rejection/compliance risk.
+## 3) Legal + Regulatory Declarations
 
-5. `[Action]` DSA trader status declaration
-- Complete trader-status declaration in App Store Connect.
+- [ ] Export compliance answer is correct (current app sets `ITSAppUsesNonExemptEncryption = false` in `/Users/maximilianheld/Developer/Ida/Ida/Info.plist`).
+- [ ] EU DSA trader status is completed and current.
+- [ ] Age rating questionnaire is complete and accurate.
+- [ ] Any territory-specific legal text (if used) is final and reviewed.
 
-6. `[Action]` Support/contact presence
-- Ensure App Store Support URL is valid.
-- Ensure users can contact you from the app or support page.
+## 4) Capability-Linked Compliance Checks
 
-7. `[Done/Action]` Feature-triggered obligations (currently looks clean)
-- Current code scan did not show obvious IAP, social login, account system, or ad SDK use in app source.
-- If later added:
-- Account creation -> must support in-app account deletion.
-- In-app purchases -> include restore purchases flow.
-- Ads/tracking -> include ATT flow and update privacy disclosures.
+- [ ] iCloud/CloudKit capability declarations are consistent with app behavior (`/Users/maximilianheld/Developer/Ida/Ida/Ida.entitlements`).
+- [ ] Push notification behavior is represented accurately in metadata (`aps-environment`, `remote-notification`).
+- [ ] If account creation is introduced later, include in-app account deletion.
+- [ ] If digital purchases are introduced later, include restore purchases flow.
+- [ ] If ads/tracking SDKs are introduced later, add ATT flow and update privacy answers.
 
-8. `[Action]` IP/license hygiene
-- Confirm ownership or license for icons, graphics, fonts, copy, and other assets.
-- Keep proof of licenses/rights.
+## 5) Final Submission Gate
 
-9. `[Action]` Claims and metadata risk control
-- Avoid unsupported medical/diagnostic or regulated claims.
-- Keep App Store metadata and screenshots accurate and non-misleading.
-
-10. `[Done]` Preflight process
-- Continue running Greenlight before each submission.
-- For this repo, root scans can include `.build` false positives; app-target scans are the useful signal.
-
-## Biggest Legal Risks for a Free "No Data" App
-
-1. Misstated privacy policy or incorrect App Privacy answers.
-2. IP infringement (assets, branding, content rights).
-3. Territory-specific compliance gaps (including EU trader status handling).
-
-## Primary Sources
-
-- App Review Guidelines: [https://developer.apple.com/app-store/review/guidelines/](https://developer.apple.com/app-store/review/guidelines/)
-- App Privacy Details: [https://developer.apple.com/app-store/app-privacy-details/](https://developer.apple.com/app-store/app-privacy-details/)
-- Third-party SDK requirements: [https://developer.apple.com/support/third-party-SDK-requirements/](https://developer.apple.com/support/third-party-SDK-requirements/)
-- Approved reasons for APIs: [https://developer.apple.com/news/upcoming-requirements/?id=05012024a](https://developer.apple.com/news/upcoming-requirements/?id=05012024a)
-- EU DSA trader requirements: [https://developer.apple.com/help/app-store-connect/manage-compliance-information/manage-european-union-digital-services-act-trader-requirements/](https://developer.apple.com/help/app-store-connect/manage-compliance-information/manage-european-union-digital-services-act-trader-requirements/)
-- Export compliance overview: [https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance](https://developer.apple.com/help/app-store-connect/manage-app-information/overview-of-export-compliance)
-
-## Quick Reuse Notes
-
-- Re-run this checklist before each release.
-- Re-validate privacy disclosures whenever dependencies or app features change.
-- If you add auth, payments, ads, health, finance, or kids-directed features, do a dedicated compliance pass.
+- [ ] Run `/Users/maximilianheld/Developer/Ida/ci_scripts/pre_submit_gate.sh` and resolve any CRITICAL findings.
+- [ ] Run a clean release build before upload:
+  - `xcodebuild -scheme "Ida - Release" -configuration Release build`
