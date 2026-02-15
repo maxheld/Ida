@@ -64,6 +64,7 @@ Release builds still use the shared scheme:
 - Tests follow existing formatting.
 - Types use PascalCase (e.g., `ChildDetailView`); properties and methods use camelCase.
 - File names usually follow feature grouping and may contain both view and model types (e.g., `ChildList.swift`, `ChildDetail.swift`).
+- Prefer keeping behavior local to the feature context, even if that means longer functions or larger files, when extracting/reusing code would increase the chance of accidental calls or unintended triggering.
 - Add new feature UI strings to `Modules/AppFeature/Localizable.xcstrings`.
 - Add app-intent/app-shell strings to `Ida/Localizable.xcstrings`.
 - In non-main targets (for example `Modules/AppFeature`), always pass `bundle: .module` to `String(localized:)`.
