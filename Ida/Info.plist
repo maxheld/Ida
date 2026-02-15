@@ -13,6 +13,10 @@
 	</array>
 	<key>CKSharingSupported</key>
 	<true/>
+	<key>PrivacyPolicyURL</key>
+	<string></string>
+	<key>SupportURL</key>
+	<string></string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

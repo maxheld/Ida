@@ -95,6 +95,19 @@ public struct ChildListView: View {
     }
     .navigationTitle(.childListTitle)
     .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        NavigationLink {
+          AboutPrivacyView()
+        } label: {
+          Image(systemName: "info.circle")
+        }
+        .accessibilityLabel(
+          Text(
+            LocalizedStringResource("about.privacy.title", bundle: .module)
+          )
+        )
+      }
+
       ToolbarItemGroup(placement: .bottomBar) {
         Spacer()
 
