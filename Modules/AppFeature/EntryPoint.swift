@@ -1,4 +1,5 @@
 import CasePaths
+import OSLog
 import SQLiteData
 import SwiftUI
 import SwiftUINavigation
@@ -16,10 +17,22 @@ public struct EntryPoint: View {
   @State var path: [Path] = []
 
   public init() {
-    if context == .live {
-      try! prepareDependencies {
+    guard context == .live else { return }
+
+    do {
+      try prepareDependencies {
         try $0.bootstrapDatabase()
       }
+    } catch {
+      let nsError = error as NSError
+      let message =
+        """
+        Failed to bootstrap app dependencies.
+        error: \(String(reflecting: error))
+        nserror: \(nsError.domain)(\(nsError.code)) userInfo=\(nsError.userInfo)
+        """
+      logger.fault("\(message, privacy: .public)")
+      fatalError(message)
     }
   }
 
@@ -44,3 +57,5 @@ public struct EntryPoint: View {
     }
   }
 }
+
+private let logger = Logger(subsystem: "Ida", category: "EntryPoint")

@@ -23,10 +23,25 @@ extension DependencyValues {
   ) throws {
     var configuration = Configuration()
     configuration.prepareDatabase { db in
-      try db.attachMetadatabase(containerIdentifier: containerIdentifierOverride)
+      do {
+        try db.attachMetadatabase(containerIdentifier: containerIdentifierOverride)
+      } catch {
+        throw BootstrapDatabaseError(
+          step: "attach CloudKit metadatabase",
+          underlying: error
+        )
+      }
     }
 
-    let database = try SQLiteData.defaultDatabase(configuration: configuration)
+    let database: any DatabaseWriter
+    do {
+      database = try SQLiteData.defaultDatabase(configuration: configuration)
+    } catch {
+      throw BootstrapDatabaseError(
+        step: "open default database",
+        underlying: error
+      )
+    }
     logger.debug(
       """
       App database
@@ -84,17 +99,44 @@ extension DependencyValues {
       )
       .execute(db)
     }
-    try migrator.migrate(database)
+    do {
+      try migrator.migrate(database)
+    } catch {
+      throw BootstrapDatabaseError(
+        step: "run database migrations",
+        underlying: error
+      )
+    }
     defaultDatabase = database
-    defaultSyncEngine = try SyncEngine(
-      for: defaultDatabase,
-      tables: Child.self, Item.self,
-      containerIdentifier: containerIdentifierOverride ?? "iCloud.com.maxheld.IdaApp"
-    )
+    do {
+      defaultSyncEngine = try SyncEngine(
+        for: defaultDatabase,
+        tables: Child.self, Item.self,
+        containerIdentifier: containerIdentifierOverride ?? "iCloud.com.maxheld.IdaApp"
+      )
+    } catch {
+      throw BootstrapDatabaseError(
+        step: "initialize CloudKit sync engine",
+        underlying: error
+      )
+    }
   }
 }
 
 private let logger = Logger(subsystem: "Ida", category: "Database")
+
+private struct BootstrapDatabaseError: Error, CustomStringConvertible, LocalizedError {
+  let step: String
+  let underlying: any Error
+
+  var description: String {
+    let nsError = underlying as NSError
+    return
+      "bootstrapDatabase failed at '\(step)'; error=\(String(reflecting: underlying)); nserror=\(nsError.domain)(\(nsError.code)) userInfo=\(nsError.userInfo)"
+  }
+
+  var errorDescription: String? { description }
+}
 
 #if DEBUG
   extension Database {
