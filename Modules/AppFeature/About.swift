@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct AboutPrivacyView: View {
+struct AboutView: View {
   private let privacyPolicyURL: URL?
   private let supportURL: URL?
 
@@ -47,6 +47,16 @@ struct AboutPrivacyView: View {
           ),
           url: supportURL
         )
+        NavigationLink {
+          AcknowledgementsView()
+        } label: {
+          Text(
+            LocalizedStringResource(
+              "about.privacy.link.acknowledgements",
+              bundle: .module
+            )
+          )
+        }
       } header: {
         Text(
           LocalizedStringResource(
@@ -63,6 +73,72 @@ struct AboutPrivacyView: View {
       )
     )
     .navigationBarTitleDisplayMode(.inline)
+  }
+}
+
+private struct AcknowledgementsView: View {
+  @State private var acknowledgements: AttributedString?
+  @State private var hasFailedToLoadAcknowledgements = false
+
+  var body: some View {
+    Group {
+      if let acknowledgements {
+        ScrollView {
+          Text(acknowledgements)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+        }
+        .textSelection(.enabled)
+      } else if hasFailedToLoadAcknowledgements {
+        Text(
+          LocalizedStringResource(
+            "about.privacy.acknowledgements.load.failed",
+            bundle: .module
+          )
+        )
+      } else {
+        ProgressView()
+      }
+    }
+    .navigationTitle(
+      LocalizedStringResource(
+        "about.privacy.acknowledgements.title",
+        bundle: .module
+      )
+    )
+    .navigationBarTitleDisplayMode(.inline)
+    .task {
+      loadAcknowledgementsIfNeeded()
+    }
+  }
+
+  private func loadAcknowledgementsIfNeeded() {
+    guard acknowledgements == nil else { return }
+
+    guard
+      let acknowledgementsURL = Bundle.module.url(
+        forResource: "ACKNOWLEDGEMENTS",
+        withExtension: "md"
+      ),
+      let acknowledgementsText = try? String(
+        contentsOf: acknowledgementsURL,
+        encoding: .utf8
+      ),
+      let acknowledgementsMarkdown = try? AttributedString(
+        markdown: acknowledgementsText,
+        options: .init(
+          allowsExtendedAttributes: true,
+          interpretedSyntax: .inlineOnlyPreservingWhitespace,
+          failurePolicy: .returnPartiallyParsedIfPossible,
+          appliesSourcePositionAttributes: true
+        )
+      )
+    else {
+      hasFailedToLoadAcknowledgements = true
+      return
+    }
+
+    acknowledgements = acknowledgementsMarkdown
   }
 }
 

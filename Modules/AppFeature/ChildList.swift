@@ -97,7 +97,7 @@ public struct ChildListView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         NavigationLink {
-          AboutPrivacyView()
+          AboutView()
         } label: {
           Image(systemName: "info.circle")
         }
