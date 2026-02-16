@@ -11,7 +11,7 @@ Effective date: February 15, 2026
 
 If you need help with Ida, please open a support issue on GitHub:
 
-- https://github.com/maxheld/ida-app/issues
+- https://github.com/maxheld/Ida/issues
 
 When reporting a problem, include:
 

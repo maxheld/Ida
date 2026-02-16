@@ -14,9 +14,9 @@
 	<key>CKSharingSupported</key>
 	<true/>
 	<key>PrivacyPolicyURL</key>
-	<string></string>
+	<string>https://maxheld.github.io/Ida/privacy/</string>
 	<key>SupportURL</key>
-	<string></string>
+	<string>https://maxheld.github.io/Ida/support/</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
