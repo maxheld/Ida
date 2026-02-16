@@ -1,4 +1,5 @@
 import SQLiteData
+import Sharing
 import SwiftUI
 
 @Observable
@@ -97,6 +98,21 @@ public struct ChildListView: View {
     .toolbar {
       ToolbarItem(placement: .topBarTrailing) {
         NavigationLink {
+          SettingsView()
+        } label: {
+          Image(systemName: "gearshape")
+        }
+        .accessibilityLabel(
+          Text(
+            LocalizedStringResource("settings.title", bundle: .module)
+          )
+        )
+      }
+
+      ToolbarSpacer(.fixed, placement: .topBarTrailing)
+
+      ToolbarItemGroup(placement: .topBarTrailing) {
+        NavigationLink {
           AboutView()
         } label: {
           Image(systemName: "info.circle")
@@ -131,6 +147,37 @@ public struct ChildListView: View {
         }
       }
     }
+  }
+}
+
+enum AppStorageKeys {
+  static let itemFormAutofocusEnabled = "isItemFormAutofocusEnabled"
+}
+
+extension SharedKey where Self == AppStorageKey<Bool>.Default {
+  static var isItemFormAutofocusEnabled: Self {
+    Self[.appStorage(AppStorageKeys.itemFormAutofocusEnabled), default: true]
+  }
+}
+
+private struct SettingsView: View {
+  @Shared(.isItemFormAutofocusEnabled) private var isItemFormAutofocusEnabled
+
+  var body: some View {
+    Form {
+      Toggle(isOn: Binding($isItemFormAutofocusEnabled)) {
+        Text(
+          LocalizedStringResource(
+            "settings.item-form.autofocus",
+            bundle: .module
+          )
+        )
+      }
+      .tint(.accentColor)
+    }
+    .navigationTitle(
+      LocalizedStringResource("settings.title", bundle: .module)
+    )
   }
 }
 

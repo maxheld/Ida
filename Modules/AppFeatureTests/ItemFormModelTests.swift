@@ -43,6 +43,27 @@ struct ItemFormModelTests {
   }
 
   @Test
+  func itemFormAutofocusSettingDefaultsToEnabled() {
+    let model = ItemFormModel(item: .init(childID: child.id))
+
+    expectNoDifference(model.isItemFormAutofocusEnabled, true)
+  }
+
+  @Test
+  func itemFormAutofocusSettingPersistsAcrossModels() {
+    let firstModel = ItemFormModel(item: .init(childID: child.id))
+    let secondModel = ItemFormModel(item: .init(childID: child.id))
+
+    expectNoDifference(firstModel.isItemFormAutofocusEnabled, true)
+    expectNoDifference(secondModel.isItemFormAutofocusEnabled, true)
+
+    firstModel.$isItemFormAutofocusEnabled.withLock { $0 = false }
+
+    expectNoDifference(firstModel.isItemFormAutofocusEnabled, false)
+    expectNoDifference(secondModel.isItemFormAutofocusEnabled, false)
+  }
+
+  @Test
   func suggestionButtonTappedSetsDescription() {
     let model = ItemFormModel(item: .init(childID: child.id, description: "Old"))
 

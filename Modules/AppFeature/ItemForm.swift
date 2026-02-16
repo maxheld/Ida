@@ -1,5 +1,6 @@
 import CloudKit
 import SQLiteData
+import Sharing
 import SwiftUI
 import SwiftUINavigation
 
@@ -24,6 +25,7 @@ final class ItemFormModel {
   @ObservationIgnored @FetchAll(Suggestion.none) var suggestions: [Suggestion]
   @ObservationIgnored @FetchAll(Suggestion.none) var emojiSuggestions: [Suggestion]
   var frequentlyUsedEmojis: [String] = []
+  @ObservationIgnored @Shared(.isItemFormAutofocusEnabled) var isItemFormAutofocusEnabled: Bool
 
   @ObservationIgnored @Dependency(\.defaultDatabase) private var database
 
@@ -139,7 +141,10 @@ struct ItemFormView: View {
         TextField(.itemFormTextfieldLabel, text: $model.item.description)
           .focused($focus, equals: .description)
           .padding()
-          .onAppear { focus = .description }
+          .onAppear {
+            guard model.isItemFormAutofocusEnabled else { return }
+            focus = .description
+          }
         
         if !model.suggestions.isEmpty {
           FlowLayout {

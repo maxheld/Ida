@@ -200,6 +200,40 @@
         }
       }
     },
+    "settings.item-form.autofocus" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschreibung im Eintragsformular automatisch fokussieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-focus item description"
+          }
+        }
+      }
+    },
+    "settings.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
     "child.detail.empty.description" : {
       "extractionState" : "manual",
       "localizations" : {
