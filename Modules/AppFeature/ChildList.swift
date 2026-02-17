@@ -83,7 +83,6 @@ public struct ChildListView: View {
 
               Text(row.child.name)
                 .font(.system(size: textSize))
-                .fontWeight(.semibold)
             }
             .padding(4)
           }
