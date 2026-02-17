@@ -229,7 +229,7 @@ public struct ChildDetailView: View {
     )
     .searchToolbarBehavior(.minimize)
     .toolbar {
-      ToolbarItemGroup(placement: .topBarTrailing) {
+      ToolbarItem(placement: .topBarTrailing) {
         if model.syncEngine.isLoading || model.isPreparingSharedRecord {
           ProgressView()
             .progressViewStyle(.circular)
@@ -240,17 +240,17 @@ public struct ChildDetailView: View {
             Image(systemName: "square.and.arrow.up")
           }
         }
-
-        Button {
-          model.reminderButtonTapped()
-        } label: {
-          Image(systemName: "bell.badge")
-        }
       }
 
       DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
 
       ToolbarItemGroup(placement: .bottomBar) {
+        Button {
+          model.reminderButtonTapped()
+        } label: {
+          Image(systemName: "calendar.badge.clock")
+        }
+
         Spacer()
 
         Button {

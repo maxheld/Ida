@@ -17,7 +17,7 @@ enum Field: Hashable {
 
 @Observable
 final class ItemFormModel {
-  static let suggestionsLimit = 12
+  static let suggestionsLimit = 24
   static let emojiHistoryLimit = 250
   static let emojiDisplayLimit = 16
 
