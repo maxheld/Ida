@@ -7,24 +7,29 @@
 - `Modules/AppFeatureTests/` contains unit tests for `AppFeature` using Swift Testing.
 - `Modules/Package.swift` defines the local Swift package (`AppFeature`, `AppFeatureTests`) used by the app target.
 - `Modules/AppFeature.xctestplan` defines the package test plan.
-- `Ida.xcodeproj/` stores the app project and shared schemes (`Ida`, `Ida - Release`, `AppFeature`).
+- `Ida.xcworkspace/` is the default entry point for local builds/tests and uses the shared schemes (`Ida`, `Ida - Release`, `AppFeature`, `AppFeatureTests`).
+- `Modules/.swiftpm/xcode/xcshareddata/xcschemes/AppFeatureTests.xcscheme` is a committed package-level scheme for running `AppFeature` tests via XcodeBuildMCP without extra args.
+- If SwiftPM regenerates package schemes in `Modules/.swiftpm/xcode/xcshareddata/xcschemes/`, keep `AppFeatureTests.xcscheme` present alongside `AppFeature.xcscheme`.
 - `ci_scripts/` includes CI helper scripts used by Xcode Cloud.
 
 ## Build, Test, and Development Commands
 Always use XcodeBuildMCP for local builds on the iPhone 17 simulator.
 - Always use XcodeBuildMCP for debugging and app launching workflows (launch, log capture, screenshots, UI snapshots, stop/relaunch). Do not use non-MCP launch/debug flows.
 - Boot iPhone 17 (once per session):
-  - `mcp__XcodeBuildMCP__session_set_defaults` with `projectPath`, `scheme: "Ida"`, `simulatorId: 27444936-D9E5-4E28-B81C-762DFF92FD21`, `configuration: "Debug"`, `useLatestOS: true`
+  - `mcp__XcodeBuildMCP__session_set_defaults` with `workspacePath: "Ida.xcworkspace"`, `scheme: "Ida"`, `simulatorId: 27444936-D9E5-4E28-B81C-762DFF92FD21`, `configuration: "Debug"`, `useLatestOS: true`
   - `mcp__XcodeBuildMCP__boot_sim`
 - Build app:
   - `mcp__XcodeBuildMCP__build_sim`
 - Build module scheme directly (optional):
-  - `mcp__XcodeBuildMCP__session_set_defaults` with `scheme: "AppFeature"` (keep same project/simulator defaults)
+  - `mcp__XcodeBuildMCP__session_set_defaults` with `scheme: "AppFeature"` (keep same workspace/simulator defaults)
   - `mcp__XcodeBuildMCP__build_sim`
+- Run package tests (default):
+  - `mcp__XcodeBuildMCP__session_set_defaults` with `scheme: "AppFeatureTests"` (keep same workspace/simulator defaults)
+  - `mcp__XcodeBuildMCP__test_sim`
 - Test status (current setup):
   - `Ida` shared scheme is not configured with a test action.
-  - `AppFeature` shared scheme exists, but `test_sim` currently reports no attached test bundles.
-  - Tests live in `Modules/AppFeatureTests/` and `Modules/AppFeature.xctestplan`; wire these into a scheme test action before relying on CLI `test_sim`.
+  - `AppFeature` and `AppFeatureTests` both run the package tests when using `workspacePath: "Ida.xcworkspace"`.
+  - `AppFeatureTests` is the preferred MCP test scheme for clarity.
 - Debug/launch/logging:
   - `mcp__XcodeBuildMCP__launch_app_sim`
   - `mcp__XcodeBuildMCP__launch_app_logs_sim`
@@ -33,7 +38,7 @@ Always use XcodeBuildMCP for local builds on the iPhone 17 simulator.
   - `mcp__XcodeBuildMCP__screenshot`
   - `mcp__XcodeBuildMCP__snapshot_ui`
 Release builds still use the shared scheme:
-- `xcodebuild -scheme "Ida - Release" -configuration Release build`
+- `xcodebuild -workspace Ida.xcworkspace -scheme "Ida - Release" -configuration Release build`
 
 ## Acknowledgements Maintenance
 - `ACKNOWLEDGEMENTS.md` is a symlink to `Modules/AppFeature/Resources/ACKNOWLEDGEMENTS.md`.
