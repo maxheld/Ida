@@ -156,7 +156,7 @@ struct ItemFormView: View {
               .multilineTextAlignment(.leading)
               .lineLimit(nil)
             }
-            .buttonStyle(.glass)
+            .buttonStyle(SuggestionButtonStyle())
           }
           .listRowBackground(Color.clear)
           .listRowInsets(.horizontal, 4)
@@ -251,6 +251,36 @@ private struct TimeShortcuts: View {
     }
     .buttonStyle(.glass)
   }
+}
+
+struct SuggestionButtonStyle: ButtonStyle {
+  func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+    configuration.label
+      .padding(.horizontal, 12)
+      .padding(.vertical, 8)
+      .background(
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+          .fill(Color(uiColor: .suggestionBackground)))
+      .scaleEffect(configuration.isPressed ? 0.98 : 1)
+      .opacity(configuration.isPressed ? 0.8 : 1)
+  }
+}
+
+private extension UIColor {
+  static let suggestionBackground = UIColor(
+    dynamicProvider: { traitCollection in
+      switch traitCollection.userInterfaceStyle {
+      case .light: return .white
+      default: return .suggestionBackgroundDark
+      }
+    }
+  )
+  static let suggestionBackgroundDark = UIColor(
+    red: 0.172549,
+    green: 0.172549,
+    blue: 0.180392,
+    alpha: 1
+  )
 }
 
 private struct FlowLayout: Layout {
