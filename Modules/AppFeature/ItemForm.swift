@@ -140,13 +140,14 @@ struct ItemFormView: View {
       Section {
         TextField(.itemFormTextfieldLabel, text: $model.item.description)
           .focused($focus, equals: .description)
-          .padding()
+          .padding(4)
           .onAppear {
             guard model.isItemFormAutofocusEnabled else { return }
             focus = .description
           }
-        
-        if !model.suggestions.isEmpty {
+      }
+      if !model.suggestions.isEmpty {
+        Section {
           FlowLayout {
             ForEach(model.suggestions) { suggestion in
               Button(suggestion.description) {
@@ -155,9 +156,12 @@ struct ItemFormView: View {
               .multilineTextAlignment(.leading)
               .lineLimit(nil)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.glass)
           }
+          .listRowBackground(Color.clear)
+          .listRowInsets(.horizontal, 4)
         }
+        .listSectionSpacing(.custom(0))
       }
     }
     .navigationBarTitleDisplayMode(.inline)

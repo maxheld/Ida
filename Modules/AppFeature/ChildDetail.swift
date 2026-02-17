@@ -190,8 +190,8 @@ public struct ChildDetailView: View {
                 model.itemTapped(item)
               } label: {
                 ItemRow(item: item)
-                  .buttonStyle(.borderless)
               }
+              .buttonStyle(.borderless)
             }
             .onDelete { indexSet in
               model.deleteRows(groupDay: group.key, at: indexSet)
@@ -278,7 +278,7 @@ private struct ItemFormSheet: View {
       ItemFormView(item: itemDraft)
         .navigationTitle(.itemFormTitle)
     }
-    .presentationDetents([.medium, .large])
+    .presentationDetents([.large])
     .presentationDragIndicator(.visible)
   }
 }
