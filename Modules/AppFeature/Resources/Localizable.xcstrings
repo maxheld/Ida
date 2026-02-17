@@ -13,19 +13,36 @@
         }
       }
     },
-    "cancel" : {
+    "about.privacy.acknowledgements.load.failed" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abbrechen"
+            "value" : "Danksagungen konnten nicht geladen werden."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel"
+            "value" : "Could not load acknowledgements."
+          }
+        }
+      }
+    },
+    "about.privacy.acknowledgements.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danksagungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acknowledgements"
           }
         }
       }
@@ -60,40 +77,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stored data"
-          }
-        }
-      }
-    },
-    "about.privacy.acknowledgements.load.failed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Danksagungen konnten nicht geladen werden."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Could not load acknowledgements."
-          }
-        }
-      }
-    },
-    "about.privacy.acknowledgements.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Danksagungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Acknowledgements"
           }
         }
       }
@@ -200,70 +183,19 @@
         }
       }
     },
-    "settings.item-form.autofocus" : {
+    "cancel" : {
       "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beschreibung im Eintragsformular automatisch fokussieren"
+            "value" : "Abbrechen"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Auto-focus item description"
-          }
-        }
-      }
-    },
-    "settings.item-form.emoji-suggestions" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Emoji-Vorschläge im Eintragsformular anzeigen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show emoji suggestions in item form"
-          }
-        }
-      }
-    },
-    "settings.item-form.suggestions" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vorschläge im Eintragsformular anzeigen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show suggestions in item form"
-          }
-        }
-      }
-    },
-    "settings.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einstellungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
+            "value" : "Cancel"
           }
         }
       }
@@ -760,6 +692,159 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Save"
+          }
+        }
+      }
+    },
+    "settings.item-form.autofocus" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beschreibung im Eintragsformular automatisch fokussieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-focus item description"
+          }
+        }
+      }
+    },
+    "settings.item-form.autofocus.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setzt den Cursor direkt in die Beschreibung beim Öffnen des Formulars."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Places the cursor in the description field when the form opens."
+          }
+        }
+      }
+    },
+    "settings.item-form.emoji-suggestions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emoji-Vorschläge im Eintragsformular anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show emoji suggestions in item form"
+          }
+        }
+      }
+    },
+    "settings.item-form.emoji-suggestions.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt häufig verwendete Emojis über der Tastatur."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows frequently used emojis above the keyboard."
+          }
+        }
+      }
+    },
+    "settings.item-form.section.description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Einstellungen wirken sich auf das Hinzufügen und Bearbeiten von Einträgen aus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These settings affect adding and editing entries."
+          }
+        }
+      }
+    },
+    "settings.item-form.section.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eintragsformular"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry form"
+          }
+        }
+      }
+    },
+    "settings.item-form.suggestions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge im Eintragsformular anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show suggestions in item form"
+          }
+        }
+      }
+    },
+    "settings.item-form.suggestions.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt ähnliche, frühere Beschreibungen als Schnellvorschläge."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows similar previous descriptions as quick suggestions."
+          }
+        }
+      }
+    },
+    "settings.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
           }
         }
       }
