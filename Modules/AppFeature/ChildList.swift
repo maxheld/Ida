@@ -152,16 +152,29 @@ public struct ChildListView: View {
 
 enum AppStorageKeys {
   static let itemFormAutofocusEnabled = "isItemFormAutofocusEnabled"
+  static let itemFormSuggestionsEnabled = "isItemFormSuggestionsEnabled"
+  static let itemFormEmojiSuggestionsEnabled = "isItemFormEmojiSuggestionsEnabled"
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var isItemFormAutofocusEnabled: Self {
     Self[.appStorage(AppStorageKeys.itemFormAutofocusEnabled), default: true]
   }
+
+  static var isItemFormSuggestionsEnabled: Self {
+    Self[.appStorage(AppStorageKeys.itemFormSuggestionsEnabled), default: true]
+  }
+
+  static var isItemFormEmojiSuggestionsEnabled: Self {
+    Self[.appStorage(AppStorageKeys.itemFormEmojiSuggestionsEnabled), default: true]
+  }
 }
 
 private struct SettingsView: View {
   @Shared(.isItemFormAutofocusEnabled) private var isItemFormAutofocusEnabled
+  @Shared(.isItemFormSuggestionsEnabled) private var isItemFormSuggestionsEnabled
+  @Shared(.isItemFormEmojiSuggestionsEnabled)
+  private var isItemFormEmojiSuggestionsEnabled
 
   var body: some View {
     Form {
@@ -169,6 +182,26 @@ private struct SettingsView: View {
         Text(
           LocalizedStringResource(
             "settings.item-form.autofocus",
+            bundle: .module
+          )
+        )
+      }
+      .tint(.accentColor)
+
+      Toggle(isOn: Binding($isItemFormSuggestionsEnabled)) {
+        Text(
+          LocalizedStringResource(
+            "settings.item-form.suggestions",
+            bundle: .module
+          )
+        )
+      }
+      .tint(.accentColor)
+
+      Toggle(isOn: Binding($isItemFormEmojiSuggestionsEnabled)) {
+        Text(
+          LocalizedStringResource(
+            "settings.item-form.emoji-suggestions",
             bundle: .module
           )
         )

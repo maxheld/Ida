@@ -64,6 +64,48 @@ struct ItemFormModelTests {
   }
 
   @Test
+  func itemFormSuggestionsSettingDefaultsToEnabled() {
+    let model = ItemFormModel(item: .init(childID: child.id))
+
+    expectNoDifference(model.isItemFormSuggestionsEnabled, true)
+  }
+
+  @Test
+  func itemFormSuggestionsSettingPersistsAcrossModels() {
+    let firstModel = ItemFormModel(item: .init(childID: child.id))
+    let secondModel = ItemFormModel(item: .init(childID: child.id))
+
+    expectNoDifference(firstModel.isItemFormSuggestionsEnabled, true)
+    expectNoDifference(secondModel.isItemFormSuggestionsEnabled, true)
+
+    firstModel.$isItemFormSuggestionsEnabled.withLock { $0 = false }
+
+    expectNoDifference(firstModel.isItemFormSuggestionsEnabled, false)
+    expectNoDifference(secondModel.isItemFormSuggestionsEnabled, false)
+  }
+
+  @Test
+  func itemFormEmojiSuggestionsSettingDefaultsToEnabled() {
+    let model = ItemFormModel(item: .init(childID: child.id))
+
+    expectNoDifference(model.isItemFormEmojiSuggestionsEnabled, true)
+  }
+
+  @Test
+  func itemFormEmojiSuggestionsSettingPersistsAcrossModels() {
+    let firstModel = ItemFormModel(item: .init(childID: child.id))
+    let secondModel = ItemFormModel(item: .init(childID: child.id))
+
+    expectNoDifference(firstModel.isItemFormEmojiSuggestionsEnabled, true)
+    expectNoDifference(secondModel.isItemFormEmojiSuggestionsEnabled, true)
+
+    firstModel.$isItemFormEmojiSuggestionsEnabled.withLock { $0 = false }
+
+    expectNoDifference(firstModel.isItemFormEmojiSuggestionsEnabled, false)
+    expectNoDifference(secondModel.isItemFormEmojiSuggestionsEnabled, false)
+  }
+
+  @Test
   func suggestionButtonTappedSetsDescription() {
     let model = ItemFormModel(item: .init(childID: child.id, description: "Old"))
 
@@ -152,6 +194,25 @@ struct ItemFormModelTests {
   }
 
   @Test
+  func loadSuggestionsTaskSkipsQueryWhenSuggestionsDisabled() async throws {
+    try insertChild(child)
+    try insertItems([
+      Item(
+        id: UUID(120),
+        childID: child.id,
+        date: Date(timeIntervalSince1970: 1_700_210_000),
+        description: "Milk bottle"
+      )
+    ])
+    let model = ItemFormModel(item: .init(childID: child.id, description: "Milk"))
+    model.$isItemFormSuggestionsEnabled.withLock { $0 = false }
+
+    await model.loadSuggestionsTask()
+
+    expectNoDifference(model.suggestions.map(\.description), [])
+  }
+
+  @Test
   func loadEmojiSuggestionsTaskCalculatesFrequency() async throws {
     try insertChild(child)
     try insertItems([
@@ -202,6 +263,26 @@ struct ItemFormModelTests {
       model.frequentlyUsedEmojis,
       Array(emojis.prefix(ItemFormModel.emojiDisplayLimit))
     )
+  }
+
+  @Test
+  func loadEmojiSuggestionsTaskSkipsQueryWhenDisabled() async throws {
+    try insertChild(child)
+    try insertItems([
+      Item(
+        id: UUID(320),
+        childID: child.id,
+        date: Date(timeIntervalSince1970: 1_700_310_000),
+        description: "😄🍎"
+      )
+    ])
+    let model = ItemFormModel(item: .init(childID: child.id))
+    model.$isItemFormEmojiSuggestionsEnabled.withLock { $0 = false }
+
+    await model.loadEmojiSuggestionsTask()
+
+    expectNoDifference(model.emojiSuggestions.map(\.description), [])
+    expectNoDifference(model.frequentlyUsedEmojis, [])
   }
 
   private func insertChild(_ child: Child) throws {

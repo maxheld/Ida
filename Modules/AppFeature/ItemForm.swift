@@ -26,6 +26,10 @@ final class ItemFormModel {
   @ObservationIgnored @FetchAll(Suggestion.none) var emojiSuggestions: [Suggestion]
   var frequentlyUsedEmojis: [String] = []
   @ObservationIgnored @Shared(.isItemFormAutofocusEnabled) var isItemFormAutofocusEnabled: Bool
+  @ObservationIgnored @Shared(.isItemFormSuggestionsEnabled) var isItemFormSuggestionsEnabled: Bool
+  @ObservationIgnored
+  @Shared(.isItemFormEmojiSuggestionsEnabled)
+  var isItemFormEmojiSuggestionsEnabled: Bool
 
   @ObservationIgnored @Dependency(\.defaultDatabase) private var database
 
@@ -68,6 +72,10 @@ final class ItemFormModel {
   }
 
   private func loadSuggestionsTask(searchText: String) async {
+    guard isItemFormSuggestionsEnabled else {
+      return
+    }
+
     let trimmedSearch = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
 
     _ = await withErrorReporting {
@@ -91,6 +99,11 @@ final class ItemFormModel {
   }
 
   func loadEmojiSuggestionsTask() async {
+    guard isItemFormEmojiSuggestionsEnabled else {
+      frequentlyUsedEmojis = []
+      return
+    }
+
     _ = await withErrorReporting {
       try await $emojiSuggestions.load(
         Item
@@ -146,7 +159,7 @@ struct ItemFormView: View {
             focus = .description
           }
       }
-      if !model.suggestions.isEmpty {
+      if model.isItemFormSuggestionsEnabled, !model.suggestions.isEmpty {
         Section {
           FlowLayout {
             ForEach(model.suggestions) { suggestion in
@@ -178,7 +191,7 @@ struct ItemFormView: View {
       }
 
       ToolbarItemGroup(placement: .keyboard) {
-        if !model.frequentlyUsedEmojis.isEmpty {
+        if model.isItemFormEmojiSuggestionsEnabled, !model.frequentlyUsedEmojis.isEmpty {
           ScrollView(.horizontal, showsIndicators: false) {
             HStack {
               ForEach(model.frequentlyUsedEmojis, id: \.self) { emoji in
