@@ -59,6 +59,7 @@ public final class ChildListModel {
 }
 
 public struct ChildListView: View {
+  @ScaledMetric(relativeTo: .body) private var textSize: CGFloat = 20
   @State private var model: ChildListModel
 
   public init(model: ChildListModel = .init()) {
@@ -79,8 +80,12 @@ public struct ChildListView: View {
                 Image(systemName: "checkmark.icloud.fill")
                   .foregroundStyle(Color.accentColor)
               }
+
               Text(row.child.name)
+                .font(.system(size: textSize))
+                .fontWeight(.semibold)
             }
+            .padding(4)
           }
         }
         .onDelete { indexSet in
