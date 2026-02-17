@@ -175,7 +175,7 @@ struct ItemFormModelTests {
   func loadSuggestionsTaskLimitsResults() async throws {
     try insertChild(child)
     try insertItems(
-      (0..<20).map { index in
+      (0..<30).map { index in
         Item(
           id: UUID(100 + index),
           childID: child.id,
@@ -190,7 +190,10 @@ struct ItemFormModelTests {
 
     expectNoDifference(model.suggestions.count, ItemFormModel.suggestionsLimit)
     expectNoDifference(model.suggestions.first?.description, "Milk 0")
-    expectNoDifference(model.suggestions.last?.description, "Milk 11")
+    expectNoDifference(
+      model.suggestions.last?.description,
+      "Milk \(ItemFormModel.suggestionsLimit - 1)"
+    )
   }
 
   @Test
