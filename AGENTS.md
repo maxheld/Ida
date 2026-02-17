@@ -78,7 +78,9 @@ Release builds still use the shared scheme:
 - In non-main targets (for example `Modules/AppFeature`), always pass `bundle: .module` to `String(localized:)`.
 
 ## Testing Guidelines
-- Any new functionality must include exhaustive unit tests that prove the intended behavior, including edge cases and failure paths.
+- Always add tests for any new functionality; no feature work is complete without corresponding tests.
+- Test suites must be exhaustive and prove intended behavior across happy paths, edge cases, and failure paths.
+- Prioritize high assertion coverage (strong, behavior-focused assertions in each test). Treat raw code coverage as a secondary metric.
 - Unit tests in `Modules/AppFeatureTests/` use Swift Testing (`import Testing`).
 - There is currently no UI test target in this repo; add one if UI coverage is needed.
 - Name test files `*Tests.swift` and keep test methods small and focused.
