@@ -2,6 +2,7 @@ import CustomDump
 import Dependencies
 import DependenciesTestSupport
 import Foundation
+import Sharing
 import Testing
 
 @testable import AppFeature
@@ -27,11 +28,27 @@ struct ReminderSheetModelTests {
   @Test
   func initialState() {
     let model = ReminderSheetModel(child: child)
+    model.$isReminderSkipEnabled.withLock { $0 = false }
 
     expectNoDifference(model.child.id, child.id)
     expectNoDifference(model.child.name, child.name)
     expectNoDifference(model.reminders, [ScheduledReminder]())
     expectNoDifference(model.isLoading, false)
+    expectNoDifference(model.isReminderSkipEnabled, false)
+  }
+
+  @Test
+  func reminderSkipTrackedSameDaySettingPersistsAcrossModels() {
+    let firstModel = ReminderSheetModel(child: child)
+    let secondModel = ReminderSheetModel(child: child)
+    firstModel.$isReminderSkipEnabled.withLock { $0 = false }
+
+    firstModel.$isReminderSkipEnabled.withLock { $0 = true }
+
+    expectNoDifference(firstModel.isReminderSkipEnabled, true)
+    expectNoDifference(secondModel.isReminderSkipEnabled, true)
+
+    firstModel.$isReminderSkipEnabled.withLock { $0 = false }
   }
 
   @Test(

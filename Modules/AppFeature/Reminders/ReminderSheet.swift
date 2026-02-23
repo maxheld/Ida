@@ -1,4 +1,5 @@
 import Dependencies
+import Sharing
 import SwiftUI
 
 @Observable
@@ -7,6 +8,9 @@ final class ReminderSheetModel {
   var reminders: [ScheduledReminder] = []
   var isLoading = false
 
+  @ObservationIgnored
+  @Shared(.isReminderSkipEnabled)
+  var isReminderSkipEnabled: Bool
   @ObservationIgnored @Dependency(\.reminderClient) var reminderClient
 
   init(child: Child) {
@@ -51,34 +55,41 @@ struct ReminderSheet: View {
             systemImage: "bell",
             description: Text(.reminderListEmptyDescription)
           )
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
           List {
-            ForEach(model.reminders) { reminder in
-              NavigationLink {
-                ReminderFormView(child: model.child, reminder: reminder) {
-                  await model.loadRemindersTask()
-                }
-              } label: {
-                HStack(alignment: .firstTextBaseline) {
-                  Image(systemName: "circle")
-                    .foregroundStyle(.secondary)
-
-                  VStack(alignment: .leading, spacing: 2) {
-                    Text("\(reminder.timeText) • \(reminder.recurrenceText)")
-                      .font(.body)
-                      .foregroundStyle(.primary)
-
-                    Text(reminder.description)
-                      .font(.body)
-                      .multilineTextAlignment(.leading)
+            Section {
+              ForEach(model.reminders) { reminder in
+                NavigationLink {
+                  ReminderFormView(child: model.child, reminder: reminder) {
+                    await model.loadRemindersTask()
+                  }
+                } label: {
+                  HStack(alignment: .firstTextBaseline) {
+                    Image(systemName: "circle")
                       .foregroundStyle(.secondary)
-                      .lineLimit(4)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                      Text("\(reminder.timeText) • \(reminder.recurrenceText)")
+                        .font(.body)
+                        .foregroundStyle(.primary)
+
+                      Text(reminder.description)
+                        .font(.body)
+                        .multilineTextAlignment(.leading)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(4)
+                    }
                   }
                 }
               }
-            }
-            .onDelete { offsets in
-              Task { await model.deleteReminders(at: offsets) }
+              .onDelete { offsets in
+                Task { await model.deleteReminders(at: offsets) }
+              }
+            } header: {
+              if model.isReminderSkipEnabled {
+                ReminderSkipTrackedLabel()
+              }
             }
           }
           .listStyle(.insetGrouped)
@@ -110,5 +121,25 @@ struct ReminderSheet: View {
     .presentationDetents([.medium, .large])
     .presentationDragIndicator(.visible)
     .task { await model.loadRemindersTask() }
+  }
+}
+
+private struct ReminderSkipTrackedLabel: View {
+  var body: some View {
+    HStack(alignment: .top, spacing: 8) {
+      Image(systemName: "checkmark.circle")
+        .foregroundStyle(Color.accentColor)
+      Text(
+        LocalizedStringResource(
+          "reminder.sheet.skip-tracked-same-day.label",
+          bundle: .module
+        )
+      )
+      .font(.footnote)
+      .foregroundStyle(.primary)
+      .multilineTextAlignment(.leading)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.vertical, 10)
   }
 }

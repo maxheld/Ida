@@ -662,6 +662,23 @@
         }
       }
     },
+    "reminder.sheet.skip-tracked-same-day.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerungen werden heute übersprungen, wenn ein Eintrag mit exakt derselben Beschreibung bereits erfasst wurde."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders will be skipped today if an entry with the exact same description was already tracked."
+          }
+        }
+      }
+    },
     "reminder.time.label" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -828,6 +845,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Shows similar previous descriptions as quick suggestions."
+          }
+        }
+      }
+    },
+    "settings.reminders.section.description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, werden Erinnerungen mit exakt gleicher Beschreibung für den Tag übersprungen, sobald der Eintrag bereits erfasst wurde."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, reminders with an exact matching description are skipped for a day once that entry is already tracked."
+          }
+        }
+      }
+    },
+    "settings.reminders.section.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerungen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reminders"
+          }
+        }
+      }
+    },
+    "settings.reminders.skip-tracked-same-day" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erinnerung überspringen, wenn heute schon erfasst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip reminder if already tracked today"
+          }
+        }
+      }
+    },
+    "settings.reminders.skip-tracked-same-day.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verhindert, dass Erinnerungen mit exakt derselben Beschreibung am selben Tag erneut erscheinen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prevents reminders with the exact same description from appearing again on that day."
           }
         }
       }

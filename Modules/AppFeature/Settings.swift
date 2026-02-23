@@ -5,6 +5,7 @@ enum AppStorageKeys {
   static let itemFormAutofocusEnabled = "isItemFormAutofocusEnabled"
   static let itemFormSuggestionsEnabled = "isItemFormSuggestionsEnabled"
   static let itemFormEmojiSuggestionsEnabled = "isItemFormEmojiSuggestionsEnabled"
+  static let isReminderSkipEnabled = "isReminderSkipEnabled"
 }
 
 extension SharedKey where Self == AppStorageKey<Bool>.Default {
@@ -19,6 +20,10 @@ extension SharedKey where Self == AppStorageKey<Bool>.Default {
   static var isItemFormEmojiSuggestionsEnabled: Self {
     Self[.appStorage(AppStorageKeys.itemFormEmojiSuggestionsEnabled), default: true]
   }
+
+  static var isReminderSkipEnabled: Self {
+    Self[.appStorage(AppStorageKeys.isReminderSkipEnabled), default: true]
+  }
 }
 
 struct SettingsView: View {
@@ -26,6 +31,8 @@ struct SettingsView: View {
   @Shared(.isItemFormSuggestionsEnabled) private var isItemFormSuggestionsEnabled
   @Shared(.isItemFormEmojiSuggestionsEnabled)
   private var isItemFormEmojiSuggestionsEnabled
+  @Shared(.isReminderSkipEnabled)
+  private var isReminderSkipEnabled
 
   var body: some View {
     Form {
@@ -82,6 +89,36 @@ struct SettingsView: View {
         Text(
           LocalizedStringResource(
             "settings.item-form.section.description",
+            bundle: .module
+          )
+        )
+      }
+
+      Section {
+        Toggle(isOn: Binding($isReminderSkipEnabled)) {
+          SettingsToggleLabel(
+            title: LocalizedStringResource(
+              "settings.reminders.skip-tracked-same-day",
+              bundle: .module
+            ),
+            subtitle: LocalizedStringResource(
+              "settings.reminders.skip-tracked-same-day.subtitle",
+              bundle: .module
+            )
+          )
+        }
+        .tint(.accentColor)
+      } header: {
+        Text(
+          LocalizedStringResource(
+            "settings.reminders.section.title",
+            bundle: .module
+          )
+        )
+      } footer: {
+        Text(
+          LocalizedStringResource(
+            "settings.reminders.section.description",
             bundle: .module
           )
         )
