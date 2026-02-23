@@ -90,6 +90,7 @@ Release builds still use the shared scheme:
 - There is currently no UI test target in this repo; add one if UI coverage is needed.
 - Name test files `*Tests.swift` and keep test methods small and focused.
 - Use deterministic dependencies in suites (`.dependency(\.context, .test)`, `.dependency(\.date.now, ...)`, `.dependency(\.uuid, .incrementing)`).
+- Keep tests fast: do not use `Task.sleep`, `sleep`, run loop blocking, or other time-based waiting in tests unless absolutely unavoidable. Prefer deterministic synchronization and direct state/control over async work.
 
 ## Refactor Learnings (Observable Models)
 - `ChildListView` logic in `Modules/AppFeature/ChildList.swift` is extracted into `ChildListModel`; keep the view focused on rendering and user-event forwarding.
