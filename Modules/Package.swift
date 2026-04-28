@@ -15,7 +15,7 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.5.2"),
+    .package(url: "https://github.com/pointfreeco/sqlite-data", from: "1.6.1"),
     .package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "1.5.5"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
     .package(url: "https://github.com/pointfreeco/swift-sharing", from: "2.0.0")

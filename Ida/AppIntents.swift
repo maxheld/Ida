@@ -100,7 +100,7 @@ struct LogActivityIntent: AppIntent {
 
     let childID = try await database.read { db in
       try Child
-        .where { $0.id == child.id }
+        .where { $0.id.eq(child.id) }
         .fetchAll(db)
         .first?
         .id
