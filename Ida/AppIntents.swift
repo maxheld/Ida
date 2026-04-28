@@ -179,30 +179,27 @@ struct LogRecentActivityIntent: AppIntent {
 }
 
 struct LogActivityShortcuts: AppShortcutsProvider {
-  static var appShortcuts: [AppShortcut] {
-    let shortcuts: [AppShortcut] = [
-      AppShortcut(
-        intent: LogActivityIntent(),
-        phrases: [
-          "Log activity in \\(.applicationName)",
-          "Log activity for \\(.applicationName)",
-          "Log \\(.applicationName)"
-        ],
-        shortTitle: "intent.log.activity.shortTitle",
-        systemImageName: "square.and.pencil"
-      ),
-      AppShortcut(
-        intent: LogRecentActivityIntent(),
-        phrases: [
-          "Quick log activity in \\(.applicationName)",
-          "Log \\(.applicationName)",
-          "Quick log \\(.applicationName)"
-        ],
-        shortTitle: "intent.log.recent.shortTitle",
-        systemImageName: "square.and.pencil"
-      )
-    ]
-    return shortcuts
+  @AppShortcutsBuilder static var appShortcuts: [AppShortcut] {
+    AppShortcut(
+      intent: LogActivityIntent(),
+      phrases: [
+        "Log activity in \(.applicationName)",
+        "Log activity for \(.applicationName)",
+        "Log \(.applicationName)"
+      ],
+      shortTitle: "intent.log.activity.shortTitle",
+      systemImageName: "square.and.pencil"
+    )
+    AppShortcut(
+      intent: LogRecentActivityIntent(),
+      phrases: [
+        "Quick log activity in \(.applicationName)",
+        "Log \(.applicationName)",
+        "Quick log \(.applicationName)"
+      ],
+      shortTitle: "intent.log.recent.shortTitle",
+      systemImageName: "square.and.pencil"
+    )
   }
 }
 
